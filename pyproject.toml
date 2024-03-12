@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "aiogram-youtube-data"
+version = "0.1.0"
+description = ""
+authors = ["Yaroslav <103318612+YaSoRoP@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ruff = "^0.3.2"
+google-api-python-client = "^2.121.0"
+environs = "^11.0.0"
+isodate = "^0.6.1"
+aiogram = "^3.4.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
