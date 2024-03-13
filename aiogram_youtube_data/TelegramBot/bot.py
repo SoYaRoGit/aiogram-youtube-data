@@ -2,8 +2,10 @@ from asyncio import run
 from aiogram import Bot, Dispatcher
 from config.config import load_config_telegram_bot
 from handlers.handler import handler_router
+from utils.logger import logger
 
 
+logger.info('Starting bot')
 
 async def main() -> None:
     config = load_config_telegram_bot()
