@@ -1,6 +1,7 @@
 from asyncio import run
 from aiogram import Bot, Dispatcher
 from config.config import load_config_telegram_bot
+from handlers.handler import handler_router
 
 
 
@@ -12,6 +13,7 @@ async def main() -> None:
         parse_mode='HTML')
     
     dp = Dispatcher()
+    dp.include_router(handler_router)
     
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
