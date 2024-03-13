@@ -103,7 +103,6 @@ def load_config_logger(path_env: str = '.env') -> ConfigLogger:
     path_log_obj = Path(PATH_LOG)
     
     
-    print(path_log_obj.name)
     if not path_log_obj.name == 'bot.log':
         raise ValueError(f'The file name in path_log should be bot.log | File name: {path_log_obj.name}')
     
