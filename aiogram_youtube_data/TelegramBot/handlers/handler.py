@@ -13,3 +13,11 @@ async def cmd_start(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_start'].format(message.from_user.username)
     )
+
+
+@handler_router.message(Command('help'))
+async def cmd_help(message: Message):
+    await message.delete()
+    await message.answer(
+        text=LEXICON_RU['cmd_help']
+    )
