@@ -18,5 +18,12 @@ class YouTubeAPIClientV3:
         except Exception as e:
             logger.error(f'An exception occurred while creating the YouTube API resource. Check API_KEY_SERVICE_YOUTUBE: {e}')
             print(f'An exception occurred while creating the YouTube API resource. Check API_KEY_SERVICE_YOUTUBE: {e}')
-            
+        
+        self.video = YouTubeAPIClientV3.__Video(self.__api_resource)
+
         logger.info('YouTubeAPIClientV3 service launched successfully')
+        
+        
+    class __Video:
+        def __init__(self, access) -> None:
+            self._access__api_resource = access
