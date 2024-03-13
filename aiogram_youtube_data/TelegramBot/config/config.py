@@ -15,11 +15,11 @@ class ConfigTelegramBot:
     telegram_bot: TelegramBot
 
 
-def load_config_telegram_bot(path_env: str = '.env' | None) -> ConfigTelegramBot:
+def load_config_telegram_bot(path_env: str = '.env') -> ConfigTelegramBot:
     """Telegram bot configuration loading function
 
     Args:
-        path_env (str, optional): Path to the .env file. Defaults to '.env' | None.
+        path_env (str): Path to the .env file. Defaults to '.env'
 
     Raises:
         ValueError: API_KEY_TELEGRAM_BOT format is incorrect
@@ -66,11 +66,11 @@ class ConfigServiceYouTubeV3:
     service_youtube: ServiceYouTubeV3
 
 
-def load_config_service_youtube(path_env: str = '.env' | None):
+def load_config_service_youtube(path_env: str = '.env'):
     """ServiceYouTubeV3 configuration loading function
 
     Args:
-        path_env (str, optional): Path to the .env file. Defaults to '.env' | None.
+        path_env (str): Path to the .env file. Defaults to '.env'
 
     Raises:
         ValueError: API_KEY_SERVICE_YOUTUBE format is incorrect
