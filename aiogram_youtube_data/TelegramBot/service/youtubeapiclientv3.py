@@ -29,4 +29,22 @@ class YouTubeAPIClientV3:
         
         
         def get_info(self, video_identifier: str) -> dict:
-            ...
+            self.__video_identifier = self.__extract_video_video_identifier(video_identifier)
+            
+        
+        def __extract_video_video_identifier(self, video_identifier: str) -> str:
+            parse_url_video = urlparse(video_identifier)
+            query_params = parse_qs(parse_url_video.query)
+            
+            if 'v' in query_params:
+                video_identifier = query_params['v'][0]
+                
+            if video_identifier and all(
+                (
+                    isinstance(video_identifier, str), 
+                    len(video_identifier) == 11
+                )
+            ):
+                return video_identifier
+            
+            raise ValueError('Invalid video ID format')
