@@ -3,12 +3,15 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
+from models.methods import DataBase
 from custom_exceptions.custom_exceptions import InvalidVideoIdFormatError
 
 
 
 handler_router = Router()
 serive = YouTubeAPIClientV3()
+database = DataBase()
+
 
 # Description Handlers
 @handler_router.message(CommandStart())
@@ -70,6 +73,7 @@ async def cmd_video(message: Message, command: CommandObject):
         video_data: dict = serive.video.get_info(command.args)
     except InvalidVideoIdFormatError as e:
         await message.reply(str(e))
+        return
     
     try:
         entities = message.entities or []

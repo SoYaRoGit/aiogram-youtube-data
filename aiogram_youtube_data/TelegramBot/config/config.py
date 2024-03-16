@@ -112,7 +112,49 @@ def load_config_logger(path_env: str = '.env') -> ConfigLogger:
         )
     )
 
+
+@dataclass
+class DataBase:
+    path_database: str
+
+
+@dataclass
+class ConfigDataBase:
+    database: DataBase
+
+
+def __validate_database_path(path: str) -> None:
+    if path is None:
+        raise ValueError("Переменная PATH_DATABASE не определена в файле окружения")
     
+    valid_extensions = ('.db', '.sqlite3')
+    if not (isinstance(path, str) and
+            path.strip() != '' and
+            path.index('.') > 0 and
+            not path.startswith('.') and
+            path.endswith(valid_extensions)):
+        raise ValueError("Некорректный путь к базе данных. Ожидается строка, заканчивающаяся на '.db' или '.sqlite3'")
+
+
+def __create_database_file(path: str) -> None:
+    database_path_obj = Path(path)
+    if not database_path_obj.is_file():
+        database_path_obj.touch()
+
+
+def load_config_database(path_env: str = '.env') -> ConfigDataBase:
+    validate_env_file(path_env)
+    
+    env = Env()
+    env.read_env(path_env)
+    
+    PATH_DATABASE = env.str('PATH_DATABASE')
+    __validate_database_path(PATH_DATABASE)
+    __create_database_file(PATH_DATABASE)
+    
+    return ConfigDataBase(database=DataBase(path_database=PATH_DATABASE))
+
+
 def validate_env_file(path_env: str) -> None:
     """Checks the .env file for existence and a valid name"""
     path_env_obj = Path(path_env)
