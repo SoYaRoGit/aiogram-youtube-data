@@ -109,6 +109,7 @@ async def cmd_video(message: Message, command: CommandObject):
             f'👍 Лайки: {html.quote(str(video_data["likeCount"]))}\n'
             f'💬 Комментарии: {html.quote(str(video_data["commentCount"]))}\n'
         )
+        database.save_video_info(video_data)
     except Exception as e:
         await message.reply(str(e))
 
