@@ -58,7 +58,6 @@ class YouTubeAPIClientV3:
                     'publishedAt': snippet.get('publishedAt', 'Нет данных'),
                     'channelId': snippet.get('channelId', 'Нет данных'),
                     'title': snippet.get('title', 'Нет данных'),
-                    'description': snippet.get('description', 'Нет данных'),
                     'thumbnails_url': snippet['thumbnails'].get('standard', {}).get('url', 'Нет данных'),
                     'thumbnails_width': snippet['thumbnails'].get('standard', {}).get('width', 'Нет данных'),
                     'thumbnails_height': snippet['thumbnails'].get('standard', {}).get('height', 'Нет данных'),
