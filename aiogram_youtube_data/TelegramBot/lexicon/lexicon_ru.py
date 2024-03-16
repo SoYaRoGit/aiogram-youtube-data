@@ -35,7 +35,7 @@ LEXICON_RU: dict = {
 - title: Название видео
 - description: Описание видео
 - thumbnails: Миниатюра изображения по умолчанию
-  - thumbnails_key: URL-адрес изображения
+  - thumbnails_url: URL-адрес изображения
   - thumbnails_width: Ширина изображения
   - thumbnails_height: Высота изображения
 - channelTitle: Название канала, которому принадлежит видео
