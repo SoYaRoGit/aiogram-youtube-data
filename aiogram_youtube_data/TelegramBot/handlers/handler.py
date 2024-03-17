@@ -70,7 +70,7 @@ async def cmd_video(message: Message, command: CommandObject):
         return
     
     try:
-        video_data: dict = serive.video.get_info(command.args)
+        video_info: dict = serive.video.get_info(command.args)
     except InvalidVideoIdFormatError as e:
         await message.reply(str(e))
         return
@@ -78,38 +78,38 @@ async def cmd_video(message: Message, command: CommandObject):
     try:
         entities = message.entities or []
         for item in entities:
-            if item.type in video_data.keys():
-                video_data[item.type] = item.extract_from(message.text)
+            if item.type in video_info.keys():
+                video_info[item.type] = item.extract_from(message.text)
         await message.reply(
             f'📹 Информация о видео\n'
-            f'🔒 Тип ресурса: {html.quote(str(video_data["kind"]))}\n'
-            f'🔑 Механизм кеширования: {html.quote(str(video_data["etag"]))}\n'
-            f'🆔 Идентификатор: {html.quote(str(video_data["id"]))}\n'
-            f'🕒 Дата и время публикации: {html.quote(str(video_data["publishedAt"]))}\n'
-            f'📺 Название канала: {html.quote(str(video_data["channelTitle"]))}\n'
-            f'👤 Идентификатор канала: {html.quote(str(video_data["channelId"]))}\n'
-            f'🎬 Название: {html.quote(str(video_data["title"]))}\n'
-            f'🖼️ URL Изображения: {html.quote(str(video_data["thumbnails_url"]))}\n'
-            f'📏 Ширина изображения: {html.quote(str(video_data["thumbnails_width"]))}\n'
-            f'📐 Высота изображения: {html.quote(str(video_data["thumbnails_height"]))}\n'
-            f'🏷️ Используемые теги: {html.quote(str(video_data["tags"]))}\n'
-            f'📚 Категория видео YouTube: {html.quote(str(video_data["categoryId"]))}\n'
-            f'📡 Предстоящая/активная трансляция: {html.quote(str(video_data["liveBroadcastContent"]))}\n'
-            f'🗣️ Язык текста в свойствах: {html.quote(str(video_data["defaultLanguage"]))}\n'
-            f'🎙️ Язык звуковой дорожки: {html.quote(str(video_data["defaultAudioLanguage"]))}\n'
-            f'⏱️ Продолжительность: {html.quote(str(video_data["duration"]))}\n'
-            f'🔄 3D/2D: {html.quote(str(video_data["dimension"]))}\n'
-            f'🎞️ Формат видео: {html.quote(str(video_data["definition"]))}\n'
-            f'📝 Субтитры доступны: {html.quote(str(video_data["caption"]))}\n'
-            f'🔏 Лицензионный контент: {html.quote(str(video_data["licensedContent"]))}\n'
-            f'🌐 Доступные страны: {html.quote(str(video_data["regionRestriction_allowed"]))}\n'
-            f'🚫 Заблокированные страны: {html.quote(str(video_data["regionRestriction_blocked"]))}\n'
-            f'📊 Рейтинг (МКРФ - Россия): {html.quote(str(video_data["contentRating"]))}\n'
-            f'👀 Просмотры: {html.quote(str(video_data["viewCount"]))}\n'
-            f'👍 Лайки: {html.quote(str(video_data["likeCount"]))}\n'
-            f'💬 Комментарии: {html.quote(str(video_data["commentCount"]))}\n'
+            f'🔒 Тип ресурса: {html.quote(str(video_info["kind"]))}\n'
+            f'🔑 Механизм кеширования: {html.quote(str(video_info["etag"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(video_info["id"]))}\n'
+            f'🕒 Дата и время публикации: {html.quote(str(video_info["publishedAt"]))}\n'
+            f'📺 Название канала: {html.quote(str(video_info["channelTitle"]))}\n'
+            f'👤 Идентификатор канала: {html.quote(str(video_info["channelId"]))}\n'
+            f'🎬 Название: {html.quote(str(video_info["title"]))}\n'
+            f'🖼️ URL Изображения: {html.quote(str(video_info["thumbnails_url"]))}\n'
+            f'📏 Ширина изображения: {html.quote(str(video_info["thumbnails_width"]))}\n'
+            f'📐 Высота изображения: {html.quote(str(video_info["thumbnails_height"]))}\n'
+            f'🏷️ Используемые теги: {html.quote(str(video_info["tags"]))}\n'
+            f'📚 Категория видео YouTube: {html.quote(str(video_info["categoryId"]))}\n'
+            f'📡 Предстоящая/активная трансляция: {html.quote(str(video_info["liveBroadcastContent"]))}\n'
+            f'🗣️ Язык текста в свойствах: {html.quote(str(video_info["defaultLanguage"]))}\n'
+            f'🎙️ Язык звуковой дорожки: {html.quote(str(video_info["defaultAudioLanguage"]))}\n'
+            f'⏱️ Продолжительность: {html.quote(str(video_info["duration"]))}\n'
+            f'🔄 3D/2D: {html.quote(str(video_info["dimension"]))}\n'
+            f'🎞️ Формат видео: {html.quote(str(video_info["definition"]))}\n'
+            f'📝 Субтитры доступны: {html.quote(str(video_info["caption"]))}\n'
+            f'🔏 Лицензионный контент: {html.quote(str(video_info["licensedContent"]))}\n'
+            f'🌐 Доступные страны: {html.quote(str(video_info["regionRestriction_allowed"]))}\n'
+            f'🚫 Заблокированные страны: {html.quote(str(video_info["regionRestriction_blocked"]))}\n'
+            f'📊 Рейтинг (МКРФ - Россия): {html.quote(str(video_info["contentRating"]))}\n'
+            f'👀 Просмотры: {html.quote(str(video_info["viewCount"]))}\n'
+            f'👍 Лайки: {html.quote(str(video_info["likeCount"]))}\n'
+            f'💬 Комментарии: {html.quote(str(video_info["commentCount"]))}\n'
         )
-        database.save_video_info(video_data)
+        database.save_video_info(video_info)
     except Exception as e:
         await message.reply(str(e))
 

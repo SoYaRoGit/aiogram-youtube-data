@@ -54,7 +54,7 @@ class YouTubeAPIClientV3:
                 content_details: dict = item.get('contentDetails', {})
                 statistics: dict = item.get('statistics', {})
 
-                video_info: dict = {
+                video_data: dict = {
                     'kind': item.get('kind', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
                     'id': item.get('id', 'Нет данных'),
@@ -83,7 +83,7 @@ class YouTubeAPIClientV3:
                     'commentCount': statistics.get('commentCount', 'Нет данных')
                 }
 
-                return video_info
+                return video_data
                 
             except HttpError as e:
                 logger.error(f'HTTP Error occurred: {e}')
@@ -143,7 +143,7 @@ class YouTubeAPIClientV3:
                 content_details: dict = item.get('contentDetails', {})
                 status: dict = item.get('status', {})
                 
-                playlsit_info: dict = {
+                playlsit_data: dict = {
                     'king': item.get('king', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
                     'id': item.get('id', 'Нет данных'),
@@ -159,7 +159,7 @@ class YouTubeAPIClientV3:
                     'duration': self.__get_info_playlists_duration(playlist_identifier)
                 }
                 
-                return playlsit_info
+                return playlsit_data
             
             
             except HttpError as e:
