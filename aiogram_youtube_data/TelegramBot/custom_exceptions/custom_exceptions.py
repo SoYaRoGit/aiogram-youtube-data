@@ -5,3 +5,13 @@ class InvalidVideoIdFormatError(Exception):
         else:
             message = 'Неверный формат идентификатора видео'
         super().__init__(message)
+
+
+class InvalidPlaylistIdFormatError(Exception):
+    def __init__(self, playlist_identifier: str = None) -> None:
+        if playlist_identifier is not None:
+            message = f'Неверный формат идентификатора плейлиста: {playlist_identifier}'
+        else:
+            message = 'Неверный формат идентификатора плейлиста'
+        super().__init__(message)
+
