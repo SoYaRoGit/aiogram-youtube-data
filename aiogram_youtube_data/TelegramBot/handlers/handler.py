@@ -4,7 +4,10 @@ from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
-from custom_exceptions.custom_exceptions import InvalidVideoIdFormatError
+from custom_exceptions.custom_exceptions import (
+    InvalidVideoIdFormatError, 
+    InvalidPlaylistIdFormatError
+)
 
 
 
@@ -116,8 +119,40 @@ async def cmd_video(message: Message, command: CommandObject):
 
 @handler_router.message(Command('playlist'))
 async def cmd_playlist(message: Message, command: CommandObject):
-    ...
-
+    if command.args is None:
+        await message.reply("Вы не указали идентификатор плейлиста. Пожалуйста, укажите идентификатор.")
+        return
+    
+    try:
+        playlist_info: dict = serive.playlist.get_info(command.args)
+    except InvalidVideoIdFormatError as e:
+        await message.reply(str(e))
+        return
+    
+    await message.reply(str(playlist_info))
+    try:
+        entities = message.entities or []
+        for item in entities:
+            if item.type in playlist_info.keys():
+                playlist_info[item.type] = item.extract_from(message.text)
+        await message.reply(
+            f'📹 Информация о плейлисте\n'
+            f'🔒 Тип ресурса: {html.quote(str(playlist_info["kind"]))}\n'
+            f'🔑 Механизм кеширования: {html.quote(str(playlist_info["etag"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(playlist_info["id"]))}\n'
+            f'🕒 Дата и время публикации: {html.quote(str(playlist_info["publishedAt"]))}\n'
+            f'👤 Идентификатор канала: {html.quote(str(playlist_info["channelId"]))}\n'
+            f'🎬 Название: {html.quote(str(playlist_info["title"]))}\n'
+            f'🖼️ URL Изображения: {html.quote(str(playlist_info["thumbnails_url"]))}\n'
+            f'📏 Ширина изображения: {html.quote(str(playlist_info["thumbnails_width"]))}\n'
+            f'📐 Высота изображения: {html.quote(str(playlist_info["thumbnails_height"]))}\n'
+            f'🔏 Статус конфиденциальности: {html.quote(str(playlist_info["privacyStatus"]))}\n'
+            f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
+            f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
+        )
+    except Exception as e:
+        await message.reply(str(e))
+        return 
 
 @handler_router.message(Command('channel'))
 async def cmd_channel(message: Message, command: CommandObject):

@@ -143,8 +143,8 @@ class YouTubeAPIClientV3:
                 content_details: dict = item.get('contentDetails', {})
                 status: dict = item.get('status', {})
                 
-                playlsit_data: dict = {
-                    'king': item.get('king', 'Нет данных'),
+                playlist_data: dict = {
+                    'kind': item.get('kind', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
                     'id': item.get('id', 'Нет данных'),
                     'publishedAt': snippet.get('publishedAt', 'Нет данных'),
@@ -159,7 +159,7 @@ class YouTubeAPIClientV3:
                     'duration': self.__get_info_playlists_duration(playlist_identifier)
                 }
                 
-                return playlsit_data
+                return playlist_data
             
             
             except HttpError as e:
