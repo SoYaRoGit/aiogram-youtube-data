@@ -8,7 +8,9 @@ from isodate import parse_duration
 from config.config import load_config_service_youtube
 from custom_exceptions.custom_exceptions import (
     InvalidVideoIdFormatError, 
-    InvalidPlaylistIdFormatError)
+    InvalidPlaylistIdFormatError,
+    InvalidChannelIdFormatError
+)
 from utils.logger import logger
 
 
@@ -29,6 +31,7 @@ class YouTubeAPIClientV3:
 
         self.video = YouTubeAPIClientV3.__Video(self.__api_resource)
         self.playlist = YouTubeAPIClientV3.__Playlist(self.__api_resource)
+        self.channel = YouTubeAPIClientV3.__Channel(self.__api_resource)
         logger.info('YouTubeAPIClientV3 service launched successfully')
         
         
@@ -243,3 +246,73 @@ class YouTubeAPIClientV3:
                 return playlist_identifier
 
             raise InvalidPlaylistIdFormatError(playlist_identifier)
+    
+    
+    class __Channel:
+        def __init__(self, access) -> None:
+            self._access__api_resource = access
+        
+        
+        def get_info(self, channel_identifier: str) -> dict:
+            try:
+                channel_identifier: str = self.__extract_channel_identifier(channel_identifier)
+                channel_info_response: dict = self._access__api_resource.channels().list(
+                    part=['snippet', 'statistics', 'status'],
+                    forHandle=channel_identifier
+                ).execute()
+                
+                item: dict = channel_info_response.get('items', [])[0]
+                
+                if not item:
+                    raise ValueError('No video information found')
+                
+                snippet: dict = item.get('snippet', {})
+                statistics: dict = item.get('statistics', {})
+                status: dict = item.get('status', {})
+                auditDetails: dict = item.get('auditDetails', {})
+                
+                channel_data: dict = {
+                    'kind': item.get('kind', 'Нет данных'),
+                    'etag': item.get('etag', 'Нет данных'),
+                    'id': item.get('id', 'Нет данных'),
+                    'title': snippet.get('title', 'Нет данных'),
+                    'publishedAt': snippet.get('publishedAt', 'Нет данных'),
+                    'thumbnails_url': snippet['thumbnails'].get('default ', {}).get('url', 'Нет данных'),
+                    'thumbnails_width': snippet['thumbnails'].get('default ', {}).get('width', 'Нет данных'),
+                    'thumbnails_height': snippet['thumbnails'].get('standard', {}).get('height', 'Нет данных'),
+                    'viewCount': statistics.get('viewCount', 'Нет данных'),
+                    'subscriberCount': statistics.get('subscriberCount', 'Нет данных'),
+                    'hiddenSubscriberCount': statistics.get('hiddenSubscriberCount', 'Нет данных'),
+                    'videoCount': statistics.get('videoCount', 'Нет данных'),
+                    'privacyStatus': status.get('privacyStatus', 'Нет данных'),
+                    'longUploadsStatus': status.get('longUploadsStatus', 'Нет данных'),
+                    'madeForKids': status.get('madeForKids', 'Нет данных'),
+                }
+                
+                return channel_info_response
+            
+            except HttpError as e:
+                logger.error(f'HTTP Error occurred: {e}')
+                raise
+            except ValueError as ve:
+                logger.error(f'ValueError occurred: {ve}')
+                raise
+            except Exception as ex:
+                logger.error(f'An unexpected error occurred: {ex}')
+                raise
+        
+        def __extract_channel_identifier(self, channel_identifier: str) -> str:            
+            if "youtube.com" not in channel_identifier:
+                raise InvalidChannelIdFormatError(channel_identifier)
+        
+            parsed_url = urlparse(channel_identifier)
+            
+            if not parsed_url.path:
+                raise InvalidChannelIdFormatError(channel_identifier)
+            
+            parts = parsed_url.path.split('@')
+            if len(parts) < 2:
+                raise ValueError("URL не содержит символа @ или имя канала после него")
+            
+            channel_name = parts[-1]
+            return channel_name

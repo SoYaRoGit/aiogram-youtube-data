@@ -14,4 +14,13 @@ class InvalidPlaylistIdFormatError(Exception):
         else:
             message = 'Неверный формат идентификатора плейлиста'
         super().__init__(message)
+    
+    
+class InvalidChannelIdFormatError(Exception):
+    def __init__(self, channel_identifier: str = None) -> None:
+        if channel_identifier is not None:
+            message = f'Неверный формат идентификатора канала: {channel_identifier}'
+        else:
+            message = 'Неверный формат идентификатора канала'
+        super().__init__(message)
 
