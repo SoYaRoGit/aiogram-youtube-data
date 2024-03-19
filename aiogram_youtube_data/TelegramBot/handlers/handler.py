@@ -125,11 +125,10 @@ async def cmd_playlist(message: Message, command: CommandObject):
     
     try:
         playlist_info: dict = serive.playlist.get_info(command.args)
-    except InvalidVideoIdFormatError as e:
+    except InvalidPlaylistIdFormatError as e:
         await message.reply(str(e))
         return
     
-    await message.reply(str(playlist_info))
     try:
         entities = message.entities or []
         for item in entities:
@@ -150,6 +149,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
             f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
             f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
         )
+        database.save_playlist_info(playlist_info)
     except Exception as e:
         await message.reply(str(e))
         return 
