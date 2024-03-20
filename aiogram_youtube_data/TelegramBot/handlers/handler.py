@@ -176,7 +176,7 @@ async def cmd_channel(message: Message, command: CommandObject):
             f'📹 Информация о плейлисте\n'
             f'🔒 Тип ресурса: {html.quote(str(channel_info["kind"]))}\n'
             f'🔑 Механизм кеширования: {html.quote(str(channel_info["etag"]))}\n'
-            f'🆔 Идентификатор: {html.quote(str(channel_info["id_сhannel"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(channel_info["id_channel"]))}\n'
             f'🎬 Название: {html.quote(str(channel_info["title"]))}\n'
             f'🕒 Дата и время публикации: {html.quote(str(channel_info["publishedAt"]))}\n'
             f'🖼️ URL Изображения: {html.quote(str(channel_info["thumbnails_url"]))}\n'
@@ -190,9 +190,7 @@ async def cmd_channel(message: Message, command: CommandObject):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
-        # database.save_playlist_info(channel_info)
     except Exception as e:
-        await message.reply(str(e))
         return 
 
 

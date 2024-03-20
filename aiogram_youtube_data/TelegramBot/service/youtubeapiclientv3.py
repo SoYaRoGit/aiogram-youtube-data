@@ -273,7 +273,7 @@ class YouTubeAPIClientV3:
                 channel_data: dict = {
                     'kind': item.get('kind', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
-                    'id_сhannel': item.get('id', 'Нет данных'),
+                    'id_channel': item.get('id', 'Нет данных'),
                     'title': snippet.get('title', 'Нет данных'),
                     'publishedAt': snippet.get('publishedAt', 'Нет данных'),
                     'thumbnails_url': snippet['thumbnails'].get('default ', {}).get('url', 'Нет данных'),
