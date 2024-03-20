@@ -1,14 +1,25 @@
 import sqlite3
-import logging
+from utils.logger import logger
 from config.config import load_config_database
 from typing import Dict, Any
+from utils.logger import logger
 
 class DataBase:
     def __init__(self) -> None:
         config = load_config_database()
         self.__path_database = config.database.path_database
-        self.__create_table_video()
-        self.__create_table_playlist()
+        
+        try:
+            self.__create_table_video()
+            logger.info(f'Таблица видео успешно инициализирована')
+        except sqlite3.Error as e:
+            logger.error(f'Произошла ошибка при инициализации таблицы видео: {e}')
+        
+        try:
+            self.__create_table_playlist()
+            logger.info(f'Таблица плейлист успешно инициализирована')
+        except sqlite3.Error as e:
+            logger.error(f'Произошла ошибка при инициализации таблицы плейлист: {e}')
         
 
     def save_video_info(self, video_info: Dict[str, Any]) -> None:
@@ -24,7 +35,7 @@ class DataBase:
                     self.__insert_table_video(cursor, video_info)
 
         except sqlite3.Error as e:
-            logging.error(f'Произошла ошибка при сохранении данных видео: {e}')
+            logger.error(f'Произошла ошибка при сохранении данных видео: {e}')
 
     def __create_table_video(self) -> None:
         try:
@@ -61,7 +72,7 @@ class DataBase:
                     )
                 """)
         except sqlite3.Error as e:
-            logging.error(f'Произошла ошибка при создании таблицы видео: {e}')
+            logger.error(f'Произошла ошибка при создании таблицы видео: {e}')
 
     def __update_table_video(self, cursor: sqlite3.Cursor, video_info: Dict[str, Any], existing_data: tuple) -> None:
         if (
@@ -156,7 +167,7 @@ class DataBase:
                     self.__insert_table_playlist(cursor, playlist_info)
                     
         except sqlite3.Error as e:
-            logging.error(f'Произошла ошибка при сохранении данных плейлиста: {e}')
+            logger.error(f'Произошла ошибка при сохранении данных плейлиста: {e}')
     
     def __create_table_playlist(self) -> None:
         try:
@@ -180,7 +191,7 @@ class DataBase:
                     )
                 """)
         except sqlite3.Error as e:
-            logging.error(f'Произошла ошибка при создании таблицы плейлиста: {e}')
+            logger.error(f'Произошла ошибка при создании таблицы плейлиста: {e}')
         
     def __update_table_playlist(self, cursor: sqlite3.Cursor, playlist_info: Dict[str, Any], existing_data: tuple) -> None:
         if (

@@ -4,11 +4,7 @@ from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
-from custom_exceptions.custom_exceptions import (
-    InvalidVideoIdFormatError, 
-    InvalidPlaylistIdFormatError,
-    InvalidChannelIdFormatError
-)
+from utils.logger import logger
 
 
 
@@ -24,6 +20,7 @@ async def cmd_start(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_start'].format(message.from_user.username)
     )
+    logger.info(f'Вызов команды /start пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 @handler_router.message(F.text == '/help video')
@@ -32,6 +29,7 @@ async def cmd_help_video(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help_video']
     )
+    logger.info(f'Вызов команды /help video пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 @handler_router.message(F.text == '/help playlist')
@@ -40,6 +38,7 @@ async def cmd_help_playlist(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help_playlist']
     )
+    logger.info(f'Вызов команды /help playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 @handler_router.message(F.text == '/help channel')
@@ -48,7 +47,7 @@ async def cmd_help_channel(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help_channel']
     )
-
+    logger.info(f'Вызов команды /help playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 @handler_router.message(F.text == '/help export')
 async def cmd_help_export(message: Message):
@@ -56,6 +55,7 @@ async def cmd_help_export(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help_export']
     )
+    logger.info(f'Вызов команды /help export пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 @handler_router.message(Command('help'))
@@ -64,6 +64,7 @@ async def cmd_help(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help']
     )
+    logger.info(f'Вызов команды /help пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 # Handlers for receiving data
@@ -71,12 +72,14 @@ async def cmd_help(message: Message):
 async def cmd_video(message: Message, command: CommandObject):
     if command.args is None:
         await message.reply("Вы не указали идентификатор видео. Пожалуйста, укажите идентификатор.")
+        logger.warning(f'Указан неправильный идентификатор видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {command.args}')
         return
     
     try:
         video_info: dict = serive.video.get_info(command.args)
-    except InvalidVideoIdFormatError as e:
+    except Exception as e:
         await message.reply(str(e))
+        logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {command.args}')
         return
     
     try:
@@ -113,8 +116,10 @@ async def cmd_video(message: Message, command: CommandObject):
             f'👍 Лайки: {html.quote(str(video_info["likeCount"]))}\n'
             f'💬 Комментарии: {html.quote(str(video_info["commentCount"]))}\n'
         )
+        logger.info(f'Данные о видео: {str(video_info["id"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
         database.save_video_info(video_info)
     except Exception as e:
+        logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id"])} ')
         await message.reply(str(e))
 
 
@@ -126,7 +131,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
     
     try:
         playlist_info: dict = serive.playlist.get_info(command.args)
-    except InvalidPlaylistIdFormatError as e:
+    except Exception as e:
         await message.reply(str(e))
         return
     
@@ -163,7 +168,7 @@ async def cmd_channel(message: Message, command: CommandObject):
     
     try:
         channel_info: dict = serive.channel.get_info(command.args)
-    except InvalidChannelIdFormatError as e:
+    except Exception as e:
         await message.reply(str(e))
         return
     
@@ -196,4 +201,4 @@ async def cmd_channel(message: Message, command: CommandObject):
 
 @handler_router.message(Command('export'))
 async def cmd_export(message: Message, command: CommandObject):
-    ...
+    message.reply_document

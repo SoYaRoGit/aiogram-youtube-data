@@ -32,7 +32,7 @@ class YouTubeAPIClientV3:
         self.video = YouTubeAPIClientV3.__Video(self.__api_resource)
         self.playlist = YouTubeAPIClientV3.__Playlist(self.__api_resource)
         self.channel = YouTubeAPIClientV3.__Channel(self.__api_resource)
-        logger.info('YouTubeAPIClientV3 service launched successfully')
+        logger.info('Сервис YouTubeAPIClientV3 был успешно инициализирован')
         
         
     class __Video:

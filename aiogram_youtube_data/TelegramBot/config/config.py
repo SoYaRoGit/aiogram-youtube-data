@@ -5,27 +5,27 @@ from pathlib import Path
 
 @dataclass
 class TelegramBot:
-    """Presentation class for telegram bot"""
+    """Презентационный класс для телеграм-бота"""
     api_key_telegram_bot: str
 
 
 @dataclass
 class ConfigTelegramBot:
-    """Configuration class for telegram bot"""
+    """Класс конфигурации для Telegram-бота"""
     telegram_bot: TelegramBot
 
 
 def load_config_telegram_bot(path_env: str = '.env') -> ConfigTelegramBot:
-    """Telegram bot configuration loading function
+    """Функция загрузки конфигурации бота Telegram
 
-    Args:
-        path_env (str): Path to the .env file. Defaults to '.env'
+    Аргументы:
+        path_env (str): путь к файлу .env. По умолчанию «.env»
 
-    Raises:
-        ValueError: API_KEY_TELEGRAM_BOT format is incorrect
+    Поднимает:
+        ValueError: неверный формат API_KEY_TELEGRAM_BOT
 
-    Returns:
-        ConfigTelegramBot: Configuration class for telegram bot
+    Возврат:
+        ConfigTelegramBot: класс конфигурации для бота Telegram.
     """
     validate_env_file(path_env)
     
@@ -34,7 +34,8 @@ def load_config_telegram_bot(path_env: str = '.env') -> ConfigTelegramBot:
     
     API_KEY_TELEGRAM_BOT: str = env.str('API_KEY_TELEGRAM_BOT')
     if not API_KEY_TELEGRAM_BOT or len(API_KEY_TELEGRAM_BOT) != 46:
-        raise ValueError(f'Failed to load key API_KEY_TELEGRAM_BOT from {path_env}\nKey: {API_KEY_TELEGRAM_BOT}')
+        # logger.error(f'Произошла ошибка при инициализации API_KEY_TELEGRAM_BOT из {path_env}\nКлюч: {API_KEY_TELEGRAM_BOT}')
+        raise ValueError(f'Произошла ошибка при инициализации API_KEY_TELEGRAM_BOT из {path_env}\nКлюч: {API_KEY_TELEGRAM_BOT}')
     
     return ConfigTelegramBot(
         telegram_bot=TelegramBot(
@@ -45,27 +46,27 @@ def load_config_telegram_bot(path_env: str = '.env') -> ConfigTelegramBot:
 
 @dataclass
 class ServiceYouTubeV3:
-    """Presentation class for ServiceYouTubeV3"""
+    """Класс представления для ServiceYouTubeV3"""
     api_key_service_youtube_v3: str
 
 
 @dataclass
 class ConfigServiceYouTubeV3:
-    """Configuration class for ServiceYouTubeV3"""
+    """Класс конфигурации для ServiceYouTubeV3"""
     service_youtube: ServiceYouTubeV3
 
 
 def load_config_service_youtube(path_env: str = '.env'):
-    """ServiceYouTubeV3 configuration loading function
+    """Функция загрузки конфигурации ServiceYouTubeV3
 
-    Args:
-        path_env (str): Path to the .env file. Defaults to '.env'
+    Аргументы:
+        path_env (str): путь к файлу .env. По умолчанию «.env»
 
-    Raises:
-        ValueError: API_KEY_SERVICE_YOUTUBE format is incorrect
+    Поднимает:
+        ValueError: неверный формат API_KEY_SERVICE_YOUTUBE
 
-    Returns:
-        ConfigServiceYouTubeV3: Configuration class for ServiceYouTubeV3
+    Возврат:
+        ConfigServiceYouTubeV3: класс конфигурации для ServiceYouTubeV3.
     """
     validate_env_file(path_env)  
 
@@ -74,7 +75,8 @@ def load_config_service_youtube(path_env: str = '.env'):
     
     API_KEY_SERVICE_YOUTUBE: str = env.str('API_KEY_SERVICE_YOUTUBE')
     if not API_KEY_SERVICE_YOUTUBE or len(API_KEY_SERVICE_YOUTUBE) != 39:
-        raise ValueError(f'Failed to load key API_KEY_SERVICE_YOUTUBE from {path_env}\nKey: {API_KEY_SERVICE_YOUTUBE}')
+        #logger.error(f'Произошла ошибка при инициализации API_KEY_SERVICE_YOUTUBE из {path_env}\nКлюч: {API_KEY_SERVICE_YOUTUBE}')
+        raise ValueError(f'Произошла ошибка при инициализации API_KEY_SERVICE_YOUTUBE из {path_env}\nКлюч: {API_KEY_SERVICE_YOUTUBE}')
     
     return ConfigServiceYouTubeV3(
         service_youtube=ServiceYouTubeV3(
@@ -104,7 +106,8 @@ def load_config_logger(path_env: str = '.env') -> ConfigLogger:
     
     
     if not path_log_obj.name == 'bot.log':
-        raise ValueError(f'The file name in path_log should be bot.log | File name: {path_log_obj.name}')
+        # logger.error(f'Имя файла в path_log должно быть bot.log | Имя файла: {path_log_obj.name}')
+        raise ValueError(f'Имя файла в path_log должно быть bot.log | Имя файла: {path_log_obj.name}')
     
     return ConfigLogger(
         logger=Logger(
@@ -125,6 +128,7 @@ class ConfigDataBase:
 
 def __validate_database_path(path: str) -> None:
     if path is None:
+        # logger.error('Переменная PATH_DATABASE не определена в файле окружения')
         raise ValueError("Переменная PATH_DATABASE не определена в файле окружения")
     
     valid_extensions = ('.db', '.sqlite3')
@@ -133,6 +137,7 @@ def __validate_database_path(path: str) -> None:
             path.index('.') > 0 and
             not path.startswith('.') and
             path.endswith(valid_extensions)):
+        # logger.error("Некорректный путь к базе данных. Ожидается строка, заканчивающаяся на '.db' или '.sqlite3'")
         raise ValueError("Некорректный путь к базе данных. Ожидается строка, заканчивающаяся на '.db' или '.sqlite3'")
 
 
@@ -156,11 +161,14 @@ def load_config_database(path_env: str = '.env') -> ConfigDataBase:
 
 
 def validate_env_file(path_env: str) -> None:
-    """Checks the .env file for existence and a valid name"""
+    """Проверяет наличие файла .env и допустимое имя"""
     path_env_obj = Path(path_env)
     if not path_env_obj.exists():
-        raise ValueError(f"The .env file at {path_env} does not exist. Please provide a valid path to the .env file.")
+        # logger.error(f"Файл .env по адресу {path_env} не существует. Укажите действительный путь к файлу .env")
+        raise ValueError(f"Файл .env по адресу {path_env} не существует. Укажите действительный путь к файлу .env")
     if not path_env_obj.is_file():
-        raise ValueError(f"The specified path {path_env} is not a file. Please provide the correct path to the .env file.")
+        # logger.error(f"Указанный путь {path_env} не является файлом. Укажите правильный путь к файлу .env")
+        raise ValueError(f"Указанный путь {path_env} не является файлом. Укажите правильный путь к файлу .env")
     if not path_env_obj.name == '.env':
-        raise ValueError(f"The file name in path_env should be .env | File name: {path_env_obj.name}")
+        # logger.error(f"Имя файла в path_env должно быть .env | Имя файла: {path_env_obj.name}")
+        raise ValueError(f"Имя файла в path_env должно быть .env | Имя файла: {path_env_obj.name}")
