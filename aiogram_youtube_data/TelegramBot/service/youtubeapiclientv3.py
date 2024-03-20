@@ -269,7 +269,6 @@ class YouTubeAPIClientV3:
                 snippet: dict = item.get('snippet', {})
                 statistics: dict = item.get('statistics', {})
                 status: dict = item.get('status', {})
-                auditDetails: dict = item.get('auditDetails', {})
                 
                 channel_data: dict = {
                     'kind': item.get('kind', 'Нет данных'),
@@ -289,7 +288,7 @@ class YouTubeAPIClientV3:
                     'madeForKids': status.get('madeForKids', 'Нет данных'),
                 }
                 
-                return channel_info_response
+                return channel_data
             
             except HttpError as e:
                 logger.error(f'HTTP Error occurred: {e}')
