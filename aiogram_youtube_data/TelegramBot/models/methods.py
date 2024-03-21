@@ -20,6 +20,12 @@ class DataBase:
             logger.info(f'Таблица плейлист успешно инициализирована')
         except sqlite3.Error as e:
             logger.error(f'Произошла ошибка при инициализации таблицы плейлист: {e}')
+            
+        try:
+            self.__create_table_channel()
+            logger.info(f'Таблица канал успешно иинициализирована')
+        except sqlite3.Error as e:
+            logger.error(f'Произошла ошибка при инициализации таблицы канал: {e}')
         
 
     def save_video_info(self, video_info: Dict[str, Any]) -> None:
@@ -250,4 +256,122 @@ class DataBase:
             playlist_info.get('privacyStatus', ''),
             playlist_info.get('itemCount', 0),
             playlist_info.get('duration', '')
+        ))
+
+
+    def save_channel_info(self, channel_info: dict) -> None:
+        try:
+            with sqlite3.connect(self.__path_database) as connection:
+                cursor = connection.cursor()
+                cursor.execute('SELECT * FROM channel_info WHERE id_channel = ?', (channel_info['id_channel'],))
+                existing_data = cursor.fetchone()
+                
+                if existing_data:
+                    self.__update_table_channel(cursor, channel_info, existing_data)
+                else:
+                    self.__insert_table_channel(cursor, channel_info)
+                    
+        except sqlite3.Error as e:
+            logger.error(f'Произошла ошибка при сохранении данных канала: {e}')
+
+    def __create_table_channel(self) -> None:
+        try:
+            with sqlite3.connect(self.__path_database) as connection:
+                cursor = connection.cursor()
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS channel_info (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        kind TEXT,
+                        etag TEXT,
+                        id_channel TEXT UNIQUE,
+                        title TEXT,
+                        publishedAt TEXT,
+                        thumbnails_url TEXT,
+                        thumbnails_width INTEGER,
+                        thumbnails_height INTEGER,
+                        viewCount INTEGER,
+                        subscriberCount INTEGER,
+                        hiddenSubscriberCount INTEGER,
+                        videoCount INTEGER,
+                        privacyStatus TEXT,
+                        longUploadsStatus TEXT,
+                        madeForKids TEXT
+                    )
+                """)
+        except sqlite3.Error as e:
+            logger.error(f'Произошла ошибка при создании таблицы канала: {e}')
+
+    def __update_table_channel(self, cursor: sqlite3.Cursor, channel_info: Dict[str, Any], existing_data: tuple) -> None:
+        if (
+            existing_data[4] != channel_info['title']
+            or existing_data[5] != channel_info['publishedAt']
+            or existing_data[6] != channel_info['thumbnails_url']
+            or existing_data[7] != channel_info['thumbnails_width']
+            or existing_data[8] != channel_info['thumbnails_height']
+            or existing_data[9] != channel_info['viewCount']
+            or existing_data[10] != channel_info['subscriberCount']
+            or existing_data[11] != channel_info['hiddenSubscriberCount']
+            or existing_data[12] != channel_info['videoCount']
+            or existing_data[13] != channel_info['privacyStatus']
+            or existing_data[14] != channel_info['longUploadsStatus']
+            or existing_data[15] != channel_info['madeForKids']
+        ):
+            update_query = """
+            UPDATE channel_info SET
+                title = ?,
+                publishedAt = ?,
+                thumbnails_url = ?,
+                thumbnails_width = ?,
+                thumbnails_height = ?,
+                viewCount = ?,
+                subscriberCount = ?,
+                hiddenSubscriberCount = ?,
+                videoCount = ?,
+                privacyStatus = ?,
+                longUploadsStatus = ?,
+                madeForKids = ?
+            WHERE id_channel = ?
+            """
+            cursor.execute(update_query, (
+                channel_info['id_channel'],
+                channel_info['title'],
+                channel_info['publishedAt'],
+                channel_info['thumbnails_url'],
+                channel_info['thumbnails_width'],
+                channel_info['thumbnails_height'],
+                channel_info['viewCount'],
+                channel_info['subscriberCount'],
+                channel_info['hiddenSubscriberCount'],
+                channel_info['videoCount'],
+                channel_info['privacyStatus'],
+                channel_info['longUploadsStatus'],
+                channel_info['madeForKids']
+            ))
+
+
+    def __insert_table_channel(self, cursor: sqlite3.Cursor, channel_info: dict) -> None:
+        insert_query = """
+        INSERT INTO channel_info (
+            kind, etag, id_channel, title, publishedAt, thumbnails_url,
+            thumbnails_width, thumbnails_height, viewCount, subscriberCount,
+            hiddenSubscriberCount, videoCount, privacyStatus, longUploadsStatus,
+            madeForKids
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        cursor.execute(insert_query, (
+            channel_info.get('kind', ''),
+            channel_info.get('etag', ''),
+            channel_info.get('id_channel', ''),
+            channel_info.get('title', ''),
+            channel_info.get('publishedAt', ''),
+            channel_info.get('thumbnails_url', ''),
+            channel_info.get('thumbnails_width', 0),
+            channel_info.get('thumbnails_height', 0),
+            channel_info.get('viewCount', 0),
+            channel_info.get('subscriberCount', 0),
+            channel_info.get('hiddenSubscriberCount', 0),
+            channel_info.get('videoCount', 0),
+            channel_info.get('privacyStatus', ''),
+            channel_info.get('longUploadsStatus', ''),
+            channel_info.get('madeForKids', '')
         ))

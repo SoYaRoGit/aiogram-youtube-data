@@ -78,7 +78,6 @@ async def cmd_video(message: Message, command: CommandObject):
     try:
         video_info: dict = serive.video.get_info(command.args)
     except Exception as e:
-        await message.reply(str(e))
         logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {command.args}')
         return
     
@@ -120,7 +119,7 @@ async def cmd_video(message: Message, command: CommandObject):
         database.save_video_info(video_info)
     except Exception as e:
         logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id"])} ')
-        await message.reply(str(e))
+        return
 
 
 @handler_router.message(Command('playlist'))
@@ -132,7 +131,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
     try:
         playlist_info: dict = serive.playlist.get_info(command.args)
     except Exception as e:
-        await message.reply(str(e))
+        logger.error(f'Произошла ошибка: {e}')
         return
     
     try:
@@ -157,7 +156,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
         )
         database.save_playlist_info(playlist_info)
     except Exception as e:
-        await message.reply(str(e))
+        logger.error(f'Произошла ошибка: {e}')
         return 
 
 @handler_router.message(Command('channel'))
@@ -169,7 +168,7 @@ async def cmd_channel(message: Message, command: CommandObject):
     try:
         channel_info: dict = serive.channel.get_info(command.args)
     except Exception as e:
-        await message.reply(str(e))
+        logger.error(f'Произошла ошибка: {e}')
         return
     
     try:
@@ -195,7 +194,9 @@ async def cmd_channel(message: Message, command: CommandObject):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
+        database.save_channel_info(channel_info)
     except Exception as e:
+        logger.error(f'Произошла ошибка: {e}')
         return 
 
 
