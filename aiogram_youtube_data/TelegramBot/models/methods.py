@@ -143,7 +143,7 @@ class DataBase:
         try:
             with sqlite3.connect(self.__path_database) as connection:
                 cursor = connection.cursor()
-                cursor.execute('SELECT * FROM playlist_info WHERE id = ?', (playlist_info['id'],))
+                cursor.execute('SELECT * FROM playlist_info WHERE id_playlist = ?', (playlist_info['id_playlist'],))
                 existing_data = cursor.fetchone()
                 
                 if existing_data:
@@ -160,9 +160,10 @@ class DataBase:
                 cursor = connection.cursor()
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS playlist_info ( 
-                        id TEXT PRIMARY KEY,
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                         kind TEXT,
                         etag TEXT,
+                        id_playlist TEXT UNIQUE,
                         publishedAt TEXT,
                         channelId TEXT,
                         title TEXT,
@@ -179,52 +180,50 @@ class DataBase:
             logger.error(f'Произошла ошибка при создании таблицы плейлиста: {e}')
         
     def __update_table_playlist(self, cursor: sqlite3.Cursor, playlist_info: Dict[str, Any], existing_data: tuple) -> None:
-        if (
-            existing_data[5] != playlist_info['title']
-            or existing_data[9] != playlist_info['channelTitle']
-            or existing_data[10] != playlist_info['privacyStatus']
-            or existing_data[11] != playlist_info['itemCount']
-            or existing_data[12] != playlist_info['duration']
-        ):
-            update_query = """
-            UPDATE playlist_info SET
-                title = ?,
-                channelTitle = ?,
-                privacyStatus = ?,
-                itemCount = ?,
-                duration = ?
-            WHERE id = ?
-            """
-            cursor.execute(update_query, (
-                playlist_info['title'],
-                playlist_info['channelTitle'],
-                playlist_info['privacyStatus'],
-                playlist_info['itemCount'],
-                playlist_info['duration']
-            ))
+        update_query = """
+        UPDATE playlist_info SET
+            kind = ?,
+            etag = ?,
+            publishedAt = ?,
+            channelId = ?,
+            title = ?,
+            thumbnails_url = ?,
+            thumbnails_width = ?,
+            thumbnails_height = ?,
+            channelTitle = ?,
+            privacyStatus = ?,
+            itemCount = ?,
+            duration = ?
+        WHERE id_playlist = ?
+        """
+        cursor.execute(update_query, (
+            playlist_info.get('kind', ''),
+            playlist_info.get('etag', ''),
+            playlist_info.get('publishedAt', ''),
+            playlist_info.get('channelId', ''),
+            playlist_info.get('title', ''),
+            playlist_info.get('thumbnails_url', ''),
+            playlist_info.get('thumbnails_width', 0),
+            playlist_info.get('thumbnails_height', 0),
+            playlist_info.get('channelTitle', ''),
+            playlist_info.get('privacyStatus', ''),
+            playlist_info.get('itemCount', 0),
+            playlist_info.get('duration', ''),
+            playlist_info['id_playlist']
+        ))
             
     def __insert_table_playlist(self, cursor: sqlite3.Cursor, playlist_info: Dict[str, Any]) -> None:
         insert_query = """
         INSERT INTO playlist_info (
-            id,
-            kind,
-            etag,
-            publishedAt,
-            channelId,
-            title,
-            thumbnails_url,
-            thumbnails_width,
-            thumbnails_height,
-            channelTitle,
-            privacyStatus,
-            itemCount,
-            duration
+            kind, etag, id_playlist, publishedAt, channelId, title,
+            thumbnails_url, thumbnails_width, thumbnails_height, channelTitle,
+            privacyStatus, itemCount, duration
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         cursor.execute(insert_query, (
-            playlist_info['id'],
             playlist_info.get('kind', ''),
             playlist_info.get('etag', ''),
+            playlist_info.get('id_playlist', ''),
             playlist_info.get('publishedAt', ''),
             playlist_info.get('channelId', ''),
             playlist_info.get('title', ''),

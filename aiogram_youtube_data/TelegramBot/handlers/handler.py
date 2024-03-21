@@ -154,7 +154,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
             f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
             f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
         )
-        # database.save_playlist_info(playlist_info)
+        database.save_playlist_info(playlist_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return 
@@ -194,7 +194,7 @@ async def cmd_channel(message: Message, command: CommandObject):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
-        # database.save_channel_info(channel_info)
+        database.save_channel_info(channel_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return 
