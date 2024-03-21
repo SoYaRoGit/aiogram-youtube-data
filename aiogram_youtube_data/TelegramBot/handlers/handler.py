@@ -116,7 +116,7 @@ async def cmd_video(message: Message, command: CommandObject):
             f'💬 Комментарии: {html.quote(str(video_info["commentCount"]))}\n'
         )
         logger.info(f'Данные о видео: {str(video_info["id_video"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
-        # database.save_video_info(video_info)
+        database.save_video_info(video_info)
     except Exception as e:
         logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id_video"])} | {e}')
         return

@@ -32,7 +32,7 @@ class DataBase:
         try:
             with sqlite3.connect(self.__path_database) as connection:
                 cursor = connection.cursor()
-                cursor.execute("SELECT * FROM video_info WHERE id = ?", (video_info['id'],))
+                cursor.execute("SELECT * FROM video_info WHERE id_video = ?", (video_info['id_video'],))
                 existing_data = cursor.fetchone()
                 
                 if existing_data:
@@ -49,9 +49,10 @@ class DataBase:
                 cursor = connection.cursor()
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS video_info (
-                        id TEXT PRIMARY KEY,
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                         kind TEXT,
                         etag TEXT,
+                        id_video TEXT UNIQUE,
                         publishedAt TEXT,
                         channelId TEXT,
                         title TEXT,
@@ -81,59 +82,37 @@ class DataBase:
             logger.error(f'Произошла ошибка при создании таблицы видео: {e}')
 
     def __update_table_video(self, cursor: sqlite3.Cursor, video_info: Dict[str, Any], existing_data: tuple) -> None:
-        if (
-            existing_data[23] != video_info['viewCount']
-            or existing_data[24] != video_info['likeCount']
-            or existing_data[25] != video_info['commentCount']
-        ):
-            update_query = """
-            UPDATE video_info SET
-                viewCount = ?,
-                likeCount = ?,
-                commentCount = ?
-            WHERE id = ?
-            """
-            cursor.execute(update_query, (
-                video_info['viewCount'],
-                video_info['likeCount'],
-                video_info['commentCount'],
-                video_info['id']
-            ))
+        existing_id, *_ = existing_data
+
+        update_query = "UPDATE video_info SET "
+        update_values = []
+
+        for attr, value in video_info.items():
+            if attr != 'id_video' and attr in video_info and video_info[attr] != existing_data[existing_data.index(attr) + 1]:
+                update_query += f"{attr} = ?, "
+                update_values.append(value)
+
+        update_query = update_query.rstrip(", ") + " WHERE id_video = ?"
+        update_values.append(existing_id)
+
+        cursor.execute(update_query, update_values)
 
     def __insert_table_video(self, cursor: sqlite3.Cursor, video_info: Dict[str, Any]) -> None:
         insert_query = """
         INSERT INTO video_info (
-            id, 
-            kind, 
-            etag, 
-            publishedAt, 
-            channelId, 
-            title, 
-            thumbnails_url, 
-            thumbnails_width,
-            thumbnails_height, 
-            channelTitle, tags, 
-            categoryId, 
-            liveBroadcastContent, 
-            defaultLanguage,
-            defaultAudioLanguage, 
-            duration, 
-            dimension, 
-            definition, 
-            caption, 
-            licensedContent,
-            regionRestriction_allowed, 
-            regionRestriction_blocked, 
-            contentRating, 
-            viewCount, 
-            likeCount,
-            commentCount
+            kind, etag, id_video, publishedAt, channelId, title,
+            thumbnails_url, thumbnails_width, thumbnails_height, channelTitle,
+            tags, categoryId, liveBroadcastContent, defaultLanguage,
+            defaultAudioLanguage, duration, dimension, definition,
+            caption, licensedContent, regionRestriction_allowed,
+            regionRestriction_blocked, contentRating, viewCount,
+            likeCount, commentCount
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         cursor.execute(insert_query, (
-            video_info['id'],
             video_info.get('kind', ''),
             video_info.get('etag', ''),
+            video_info.get('id_video', ''),
             video_info.get('publishedAt', ''),
             video_info.get('channelId', ''),
             video_info.get('title', ''),
@@ -158,8 +137,8 @@ class DataBase:
             video_info.get('likeCount', 0),
             video_info.get('commentCount', 0)
         ))
-    
-    
+
+
     def save_playlist_info(self, playlist_info: Dict[str, Any]) -> None:
         try:
             with sqlite3.connect(self.__path_database) as connection:
