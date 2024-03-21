@@ -60,7 +60,7 @@ class YouTubeAPIClientV3:
                 video_data: dict = {
                     'kind': item.get('kind', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
-                    'id': item.get('id', 'Нет данных'),
+                    'id_video': item.get('id', 'Нет данных'),
                     'publishedAt': snippet.get('publishedAt', 'Нет данных'),
                     'channelId': snippet.get('channelId', 'Нет данных'),
                     'title': snippet.get('title', 'Нет данных'),
@@ -149,7 +149,7 @@ class YouTubeAPIClientV3:
                 playlist_data: dict = {
                     'kind': item.get('kind', 'Нет данных'),
                     'etag': item.get('etag', 'Нет данных'),
-                    'id': item.get('id', 'Нет данных'),
+                    'id_playlist': item.get('id', 'Нет данных'),
                     'publishedAt': snippet.get('publishedAt', 'Нет данных'),
                     'channelId': snippet.get('channelId', 'Нет данных'),
                     'title': snippet.get('title', 'Нет данных'),

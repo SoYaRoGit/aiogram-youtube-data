@@ -90,7 +90,7 @@ async def cmd_video(message: Message, command: CommandObject):
             f'📹 Информация о видео\n'
             f'🔒 Тип ресурса: {html.quote(str(video_info["kind"]))}\n'
             f'🔑 Механизм кеширования: {html.quote(str(video_info["etag"]))}\n'
-            f'🆔 Идентификатор: {html.quote(str(video_info["id"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(video_info["id_video"]))}\n'
             f'🕒 Дата и время публикации: {html.quote(str(video_info["publishedAt"]))}\n'
             f'📺 Название канала: {html.quote(str(video_info["channelTitle"]))}\n'
             f'👤 Идентификатор канала: {html.quote(str(video_info["channelId"]))}\n'
@@ -115,10 +115,10 @@ async def cmd_video(message: Message, command: CommandObject):
             f'👍 Лайки: {html.quote(str(video_info["likeCount"]))}\n'
             f'💬 Комментарии: {html.quote(str(video_info["commentCount"]))}\n'
         )
-        logger.info(f'Данные о видео: {str(video_info["id"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
-        database.save_video_info(video_info)
+        logger.info(f'Данные о видео: {str(video_info["id_video"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
+        # database.save_video_info(video_info)
     except Exception as e:
-        logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id"])} ')
+        logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id_video"])} | {e}')
         return
 
 
@@ -143,7 +143,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
             f'📹 Информация о плейлисте\n'
             f'🔒 Тип ресурса: {html.quote(str(playlist_info["kind"]))}\n'
             f'🔑 Механизм кеширования: {html.quote(str(playlist_info["etag"]))}\n'
-            f'🆔 Идентификатор: {html.quote(str(playlist_info["id"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(playlist_info["id_playlist"]))}\n'
             f'🕒 Дата и время публикации: {html.quote(str(playlist_info["publishedAt"]))}\n'
             f'👤 Идентификатор канала: {html.quote(str(playlist_info["channelId"]))}\n'
             f'🎬 Название: {html.quote(str(playlist_info["title"]))}\n'
@@ -154,7 +154,7 @@ async def cmd_playlist(message: Message, command: CommandObject):
             f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
             f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
         )
-        database.save_playlist_info(playlist_info)
+        # database.save_playlist_info(playlist_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return 
@@ -194,7 +194,7 @@ async def cmd_channel(message: Message, command: CommandObject):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
-        database.save_channel_info(channel_info)
+        # database.save_channel_info(channel_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return 
