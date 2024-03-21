@@ -12,6 +12,7 @@ google-api-python-client = "^2.121.0"
 environs = "^11.0.0"
 isodate = "^0.6.1"
 aiogram = "^3.4.1"
+openpyxl = "^3.1.2"
 
 
 [build-system]

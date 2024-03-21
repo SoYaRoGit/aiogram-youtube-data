@@ -201,5 +201,5 @@ async def cmd_channel(message: Message, command: CommandObject):
 
 
 @handler_router.message(Command('export'))
-async def cmd_export(message: Message, command: CommandObject):
-    message.reply_document
+async def cmd_export(message: Message):
+    ...
