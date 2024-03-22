@@ -1,10 +1,10 @@
-import io
 from aiogram import Router, F, html
-from aiogram.types import Message, InputFile
+from aiogram.types import Message, BufferedInputFile
 from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
+from custom_filters.custom_filters import VideoIdentifierFilter
 from utils.logger import logger
 from config.config import bot
 from telegram_db_excel_service import send_excel_file
@@ -70,17 +70,13 @@ async def cmd_help(message: Message):
 
 
 # Handlers for receiving data
-@handler_router.message(Command('video'))
-async def cmd_video(message: Message, command: CommandObject):
-    if command.args is None:
-        await message.reply("Вы не указали идентификатор видео. Пожалуйста, укажите идентификатор.")
-        logger.warning(f'Указан неправильный идентификатор видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {command.args}')
-        return
-    
+@handler_router.message(VideoIdentifierFilter())
+async def cmd_video(message: Message):
+    logger.info('оТРАБОТАЛ ХЕНДЛЕР С ВИДЕО!')
     try:
-        video_info: dict = serive.video.get_info(command.args)
+        video_info: dict = serive.video.get_info(message.text)
     except Exception as e:
-        logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {command.args}')
+        logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {message.text}')
         return
     
     try:
@@ -201,9 +197,6 @@ async def cmd_channel(message: Message, command: CommandObject):
         logger.error(f'Произошла ошибка: {e}')
         return 
 
-
-
-from aiogram.types import BufferedInputFile
 
 @handler_router.message(Command('export'))
 async def cmd_export(message: Message):

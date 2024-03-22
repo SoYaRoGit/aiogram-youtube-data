@@ -43,6 +43,7 @@ class YouTubeAPIClientV3:
         def get_info(self, video_identifier: str) -> dict:
             try:
                 video_identifier = self.__extract_video_identifier(video_identifier)
+
                 video_info_response: dict = self._access__api_resource.videos().list(
                     part=['snippet', 'contentDetails', 'statistics'],
                     id=video_identifier
@@ -107,21 +108,35 @@ class YouTubeAPIClientV3:
             return video_duration_formatted
 
         def __extract_video_identifier(self, video_identifier: str) -> str:
-            parse_url_video = urlparse(video_identifier)
-            query_params = parse_qs(parse_url_video.query)
-            
-            if 'v' in query_params:
-                video_identifier = query_params['v'][0]
+            if 'https://youtu.be/' in video_identifier:
+                # Если сообщение содержит строку 'https://youtu.be/', извлекаем идентификатор видео
+                segments = video_identifier.split("/")
+                video_identifier = segments[-1]
+                if "?" in video_identifier:
+                    video_identifier = video_identifier.split("?")[0]
+                    
+                # Проверяем длину идентификатора
+                if len(video_identifier) == 11:
+                    return video_identifier
+                else:
+                    return InvalidVideoIdFormatError(video_identifier)
+            elif 'https://www.youtube.com/' in video_identifier:
+                # Если сообщение содержит строку 'https://www.youtube.com/', извлекаем идентификатор видео из параметра запроса 'v'
+                parse_url_video = urlparse(video_identifier)
+                query_params = parse_qs(parse_url_video.query)
                 
-            if video_identifier and all(
-                (
-                    isinstance(video_identifier, str), 
-                    len(video_identifier) == 11
-                )
-            ):
-                return video_identifier
-            
-            raise InvalidVideoIdFormatError(video_identifier)
+                if 'v' in query_params:
+                    video_identifier = query_params['v'][0]
+                    
+                # Проверяем, является ли идентификатор строкой длины 11
+                if video_identifier and all(
+                    (
+                        isinstance(video_identifier, str), 
+                        len(video_identifier) == 11
+                    )
+                ):
+                    return video_identifier
+            return InvalidVideoIdFormatError(video_identifier)
     
     
     class __Playlist():
