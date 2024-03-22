@@ -100,3 +100,12 @@ LEXICON_RU: dict = {
 - contentIdClaimsGoodStanding: Указывает, есть ли на канале нерешенные претензии
 """
 }
+
+LEXICON_COMMANDS_RU: dict[str, str] = {
+    '/start': 'Стартовое сообщение',
+    '/help': 'Справка по командам',
+    '/help_video': 'Описание работы с YouTube Video',
+    '/help_playlist': 'Описание работы с YouTube Playlist',
+    '/help_channel': 'Описание работы с YouTube Channel',
+    '/help_export': 'Описание работы с Excel'
+}

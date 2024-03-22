@@ -25,39 +25,39 @@ async def cmd_start(message: Message):
     logger.info(f'Вызов команды /start пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
-@handler_router.message(F.text == '/help video')
+@handler_router.message(F.text == '/help_video')
 async def cmd_help_video(message: Message):
     await message.delete()
     await message.answer(
         text=LEXICON_RU['cmd_help_video']
     )
-    logger.info(f'Вызов команды /help video пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_video пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
-@handler_router.message(F.text == '/help playlist')
+@handler_router.message(F.text == '/help_playlist')
 async def cmd_help_playlist(message: Message):
     await message.delete()
     await message.answer(
         text=LEXICON_RU['cmd_help_playlist']
     )
-    logger.info(f'Вызов команды /help playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
-@handler_router.message(F.text == '/help channel')
+@handler_router.message(F.text == '/help_channel')
 async def cmd_help_channel(message: Message):
     await message.delete()
     await message.answer(
         text=LEXICON_RU['cmd_help_channel']
     )
-    logger.info(f'Вызов команды /help playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
-@handler_router.message(F.text == '/help export')
+@handler_router.message(F.text == '/help_export')
 async def cmd_help_export(message: Message):
     await message.delete()
     await message.answer(
         text=LEXICON_RU['cmd_help_export']
     )
-    logger.info(f'Вызов команды /help export пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_export пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 
 @handler_router.message(Command('help'))
