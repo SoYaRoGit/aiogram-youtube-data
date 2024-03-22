@@ -107,5 +107,6 @@ LEXICON_COMMANDS_RU: dict[str, str] = {
     '/help_video': 'Описание работы с YouTube Video',
     '/help_playlist': 'Описание работы с YouTube Playlist',
     '/help_channel': 'Описание работы с YouTube Channel',
-    '/help_export': 'Описание работы с Excel'
+    '/help_export': 'Описание работы с Excel',
+    '/export': 'Вывод базы данных в Excel'
 }
