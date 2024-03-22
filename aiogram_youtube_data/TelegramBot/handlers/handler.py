@@ -1,11 +1,13 @@
+import io
 from aiogram import Router, F, html
-from aiogram.types import Message
+from aiogram.types import Message, InputFile
 from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
 from utils.logger import logger
-
+from config.config import bot
+from telegram_db_excel_service import send_excel_file
 
 
 handler_router = Router()
@@ -200,6 +202,15 @@ async def cmd_channel(message: Message, command: CommandObject):
         return 
 
 
+
+from aiogram.types import BufferedInputFile
+
 @handler_router.message(Command('export'))
 async def cmd_export(message: Message):
-    ...
+    excel_file = send_excel_file()
+    
+    await bot.send_document(message.from_user.id, document=BufferedInputFile(excel_file.read(), 'db_data.xlsx'))
+
+
+
+

@@ -1,3 +1,4 @@
+from aiogram import Bot
 from dataclasses import dataclass
 from environs import Env
 from pathlib import Path
@@ -172,3 +173,10 @@ def validate_env_file(path_env: str) -> None:
     if not path_env_obj.name == '.env':
         # logger.error(f"Имя файла в path_env должно быть .env | Имя файла: {path_env_obj.name}")
         raise ValueError(f"Имя файла в path_env должно быть .env | Имя файла: {path_env_obj.name}")
+    
+    
+config = load_config_telegram_bot()
+    
+bot = Bot(
+    config.telegram_bot.api_key_telegram_bot, 
+    parse_mode='HTML')
