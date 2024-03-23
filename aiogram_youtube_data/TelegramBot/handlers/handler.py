@@ -4,7 +4,9 @@ from aiogram.filters import CommandStart, CommandObject, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
-from custom_filters.custom_filters import VideoIdentifierFilter
+from custom_filters.custom_filters import (
+    VideoIdentifierFilter, 
+    PlaylistIdentifierFilter)
 from utils.logger import logger
 from config.config import bot
 from telegram_db_excel_service import send_excel_file
@@ -72,7 +74,6 @@ async def cmd_help(message: Message):
 # Handlers for receiving data
 @handler_router.message(VideoIdentifierFilter())
 async def cmd_video(message: Message):
-    logger.info('оТРАБОТАЛ ХЕНДЛЕР С ВИДЕО!')
     try:
         video_info: dict = serive.video.get_info(message.text)
     except Exception as e:
@@ -120,14 +121,10 @@ async def cmd_video(message: Message):
         return
 
 
-@handler_router.message(Command('playlist'))
-async def cmd_playlist(message: Message, command: CommandObject):
-    if command.args is None:
-        await message.reply("Вы не указали идентификатор плейлиста. Пожалуйста, укажите идентификатор.")
-        return
-    
+@handler_router.message(PlaylistIdentifierFilter())
+async def cmd_playlist(message: Message):    
     try:
-        playlist_info: dict = serive.playlist.get_info(command.args)
+        playlist_info: dict = serive.playlist.get_info(message.text)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return

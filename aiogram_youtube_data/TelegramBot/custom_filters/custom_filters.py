@@ -31,4 +31,23 @@ class VideoIdentifierFilter(BaseFilter):
             ):
                 return True
         return False
+    
+
+class PlaylistIdentifierFilter(BaseFilter):
+    async def __call__(self, message: Message) -> bool:
+        parsed_url = urlparse(message.text)
+        query_params = parse_qs(parsed_url.query)
+
+        if 'list' in query_params:
+            playlist_identifier = query_params['list'][0]
+
+        if playlist_identifier and all(
+            (
+                isinstance(playlist_identifier, str), 
+                playlist_identifier.startswith('PL'), 
+                len(playlist_identifier) == 34)
+        ):
+            return True
+
+        return False
 
