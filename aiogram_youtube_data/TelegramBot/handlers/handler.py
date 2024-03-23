@@ -1,6 +1,6 @@
 from aiogram import Router, F, html
 from aiogram.types import Message, BufferedInputFile
-from aiogram.filters import CommandStart, CommandObject, Command
+from aiogram.filters import CommandStart, Command
 from lexicon.lexicon_ru import LEXICON_RU
 from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
@@ -52,7 +52,7 @@ async def cmd_help_channel(message: Message):
     await message.answer(
         text=LEXICON_RU['cmd_help_channel']
     )
-    logger.info(f'Вызов команды /help_playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_channel пользователем: {message.from_user.full_name} | {message.from_user.id}')
 
 @handler_router.message(F.text == '/help_export')
 async def cmd_help_export(message: Message):
@@ -101,6 +101,7 @@ async def cmd_playlist(message: Message):
             f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
             f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
         )
+        logger.info(f'Данные о плейлисте: {str(playlist_info["id_playlist"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
         database.save_playlist_info(playlist_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
@@ -175,7 +176,7 @@ async def cmd_channel(message: Message):
             f'🔑 Механизм кеширования: {html.quote(str(channel_info["etag"]))}\n'
             f'🆔 Идентификатор: {html.quote(str(channel_info["id_channel"]))}\n'
             f'🎬 Название: {html.quote(str(channel_info["title"]))}\n'
-            f'🕒 Дата и время публикации: {html.quote(str(channel_info["publishedAt"]))}\n'
+            f'🕒 Дата и время создания канала: {html.quote(str(channel_info["publishedAt"]))}\n'
             f'🖼️ URL Изображения: {html.quote(str(channel_info["thumbnails_url"]))}\n'
             f'📏 Ширина изображения: {html.quote(str(channel_info["thumbnails_width"]))}\n'
             f'📐 Высота изображения: {html.quote(str(channel_info["thumbnails_height"]))}\n'
@@ -187,6 +188,7 @@ async def cmd_channel(message: Message):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
+        logger.info(f'Данные о канале: {str(channel_info["title"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
         database.save_channel_info(channel_info)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
@@ -196,9 +198,11 @@ async def cmd_channel(message: Message):
 @handler_router.message(Command('export'))
 async def cmd_export(message: Message):
     excel_file = send_excel_file()
-    
     await bot.send_document(message.from_user.id, document=BufferedInputFile(excel_file.read(), 'db_data.xlsx'))
+    logger.info(f'Произведена выгрузка данных /export для польователя: {message.from_user.full_name} | {message.from_user.id}')
+    
 
-
-
-
+@handler_router.message()
+async def cmd_empty(message: Message):
+    await message.reply(text='Введеная неизвестная команда или идентификатор')
+    logger.info(f'Введена неизвестная команда или идентификатор: {message.from_user.full_name} | {message.from_user.id} | Текст: {message.text}')
