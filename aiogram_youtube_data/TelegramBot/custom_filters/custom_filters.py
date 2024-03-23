@@ -21,6 +21,8 @@ class VideoIdentifierFilter(BaseFilter):
             
             if 'v' in query_params:
                 video_identifier = query_params['v'][0]
+            else:
+                return False
                 
             # Проверяем, является ли идентификатор строкой длины 11
             if video_identifier and all(
@@ -40,6 +42,8 @@ class PlaylistIdentifierFilter(BaseFilter):
 
         if 'list' in query_params:
             playlist_identifier = query_params['list'][0]
+        else:
+            return False
 
         if playlist_identifier and all(
             (
@@ -51,3 +55,19 @@ class PlaylistIdentifierFilter(BaseFilter):
 
         return False
 
+
+class ChannelIdentifierFilter(BaseFilter):
+    async def __call__(self, message: Message) -> bool:
+        if "youtube.com" not in message.text:
+            return False
+        
+        parsed_url = urlparse(message.text)
+            
+        if not parsed_url.path:
+            return False
+            
+        parts = parsed_url.path.split('@')
+        if len(parts) < 2:
+            return False
+            
+        return True

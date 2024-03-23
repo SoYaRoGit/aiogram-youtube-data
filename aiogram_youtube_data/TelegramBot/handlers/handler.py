@@ -6,7 +6,8 @@ from service.youtubeapiclientv3 import YouTubeAPIClientV3
 from models.methods import DataBase
 from custom_filters.custom_filters import (
     VideoIdentifierFilter, 
-    PlaylistIdentifierFilter)
+    PlaylistIdentifierFilter,
+    ChannelIdentifierFilter)
 from utils.logger import logger
 from config.config import bot
 from telegram_db_excel_service import send_excel_file
@@ -72,6 +73,40 @@ async def cmd_help(message: Message):
 
 
 # Handlers for receiving data
+@handler_router.message(PlaylistIdentifierFilter())
+async def cmd_playlist(message: Message):    
+    try:
+        playlist_info: dict = serive.playlist.get_info(message.text)
+    except Exception as e:
+        logger.error(f'Произошла ошибка: {e}')
+        return
+    
+    try:
+        entities = message.entities or []
+        for item in entities:
+            if item.type in playlist_info.keys():
+                playlist_info[item.type] = item.extract_from(message.text)
+        await message.reply(
+            f'📹 Информация о плейлисте\n'
+            f'🔒 Тип ресурса: {html.quote(str(playlist_info["kind"]))}\n'
+            f'🔑 Механизм кеширования: {html.quote(str(playlist_info["etag"]))}\n'
+            f'🆔 Идентификатор: {html.quote(str(playlist_info["id_playlist"]))}\n'
+            f'🕒 Дата и время публикации: {html.quote(str(playlist_info["publishedAt"]))}\n'
+            f'👤 Идентификатор канала: {html.quote(str(playlist_info["channelId"]))}\n'
+            f'🎬 Название: {html.quote(str(playlist_info["title"]))}\n'
+            f'🖼️ URL Изображения: {html.quote(str(playlist_info["thumbnails_url"]))}\n'
+            f'📏 Ширина изображения: {html.quote(str(playlist_info["thumbnails_width"]))}\n'
+            f'📐 Высота изображения: {html.quote(str(playlist_info["thumbnails_height"]))}\n'
+            f'🔏 Статус конфиденциальности: {html.quote(str(playlist_info["privacyStatus"]))}\n'
+            f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
+            f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
+        )
+        database.save_playlist_info(playlist_info)
+    except Exception as e:
+        logger.error(f'Произошла ошибка: {e}')
+        return 
+
+
 @handler_router.message(VideoIdentifierFilter())
 async def cmd_video(message: Message):
     try:
@@ -121,47 +156,10 @@ async def cmd_video(message: Message):
         return
 
 
-@handler_router.message(PlaylistIdentifierFilter())
-async def cmd_playlist(message: Message):    
+@handler_router.message(ChannelIdentifierFilter())
+async def cmd_channel(message: Message):    
     try:
-        playlist_info: dict = serive.playlist.get_info(message.text)
-    except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
-        return
-    
-    try:
-        entities = message.entities or []
-        for item in entities:
-            if item.type in playlist_info.keys():
-                playlist_info[item.type] = item.extract_from(message.text)
-        await message.reply(
-            f'📹 Информация о плейлисте\n'
-            f'🔒 Тип ресурса: {html.quote(str(playlist_info["kind"]))}\n'
-            f'🔑 Механизм кеширования: {html.quote(str(playlist_info["etag"]))}\n'
-            f'🆔 Идентификатор: {html.quote(str(playlist_info["id_playlist"]))}\n'
-            f'🕒 Дата и время публикации: {html.quote(str(playlist_info["publishedAt"]))}\n'
-            f'👤 Идентификатор канала: {html.quote(str(playlist_info["channelId"]))}\n'
-            f'🎬 Название: {html.quote(str(playlist_info["title"]))}\n'
-            f'🖼️ URL Изображения: {html.quote(str(playlist_info["thumbnails_url"]))}\n'
-            f'📏 Ширина изображения: {html.quote(str(playlist_info["thumbnails_width"]))}\n'
-            f'📐 Высота изображения: {html.quote(str(playlist_info["thumbnails_height"]))}\n'
-            f'🔏 Статус конфиденциальности: {html.quote(str(playlist_info["privacyStatus"]))}\n'
-            f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
-            f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
-        )
-        database.save_playlist_info(playlist_info)
-    except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
-        return 
-
-@handler_router.message(Command('channel'))
-async def cmd_channel(message: Message, command: CommandObject):
-    if command.args is None:
-        await message.reply("Вы не указали идентификатор плейлиста. Пожалуйста, укажите идентификатор.")
-        return
-    
-    try:
-        channel_info: dict = serive.channel.get_info(command.args)
+        channel_info: dict = serive.channel.get_info(message.text)
     except Exception as e:
         logger.error(f'Произошла ошибка: {e}')
         return
@@ -172,7 +170,7 @@ async def cmd_channel(message: Message, command: CommandObject):
             if item.type in channel_info.keys():
                 channel_info[item.type] = item.extract_from(message.text)
         await message.reply(
-            f'📹 Информация о плейлисте\n'
+            f'📹 Информация о канале\n'
             f'🔒 Тип ресурса: {html.quote(str(channel_info["kind"]))}\n'
             f'🔑 Механизм кеширования: {html.quote(str(channel_info["etag"]))}\n'
             f'🆔 Идентификатор: {html.quote(str(channel_info["id_channel"]))}\n'
