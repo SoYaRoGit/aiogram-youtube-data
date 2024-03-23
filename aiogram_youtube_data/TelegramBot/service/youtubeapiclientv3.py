@@ -14,33 +14,76 @@ from custom_exceptions.custom_exceptions import (
 from utils.logger import logger
 
 
-
 class YouTubeAPIClientV3:
     def __init__(self) -> None:
         try:
-            config = load_config_service_youtube()
+            config = load_config_service_youtube()  # Загрузка конфигурации для сервиса YouTube
+            # Инициализация ресурса YouTube API с использованием ключа разработчика из конфигурации
             self.__api_resource = build(
                 serviceName='youtube',
                 version='v3',
                 developerKey=config.service_youtube.api_key_service_youtube_v3
             )
         except Exception as e:
-            error_message = f'An exception occurred while creating the YouTube API resource. Check API_KEY_SERVICE_YOUTUBE: {e}'
+            # Регистрация ошибки, если инициализация не удалась, и вызов исключения ValueError
+            error_message = f'Произошла ошибка при создании ресурса YouTube API. Проверьте API_KEY_SERVICE_YOUTUBE: {e}'
             logger.error(error_message)
             raise ValueError(error_message)
 
+        # Инициализация внутренних классов для взаимодействия с различными ресурсами
         self.video = YouTubeAPIClientV3.__Video(self.__api_resource)
         self.playlist = YouTubeAPIClientV3.__Playlist(self.__api_resource)
         self.channel = YouTubeAPIClientV3.__Channel(self.__api_resource)
+        
         logger.info('Сервис YouTubeAPIClientV3 был успешно инициализирован')
         
         
     class __Video:
+        """
+        Класс для получения информации о видео из YouTube API.
+
+        Attributes:
+            _access__api_resource: Ресурс доступа к YouTube API.
+
+        Methods:
+            get_info(video_identifier: str) -> dict:
+                Получает информацию о видео по его идентификатору.
+            __format_duration(duration_iso8601: str) -> str:
+                Преобразует длительность видео из формата ISO 8601 в удобочитаемый формат.
+            __extract_video_identifier(video_identifier: str) -> str:
+                Извлекает идентификатор видео из переданной строки.
+
+        Raises:
+            HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+            ValueError: Если идентификатор видео неверного формата или нет информации о видео.
+
+        """
         def __init__(self, access) -> None:
+            """
+            Инициализация объекта класса.
+
+            Args:
+                access: Ресурс доступа к YouTube API.
+
+            """
             self._access__api_resource = access
         
         
         def get_info(self, video_identifier: str) -> dict:
+            """
+            Получает информацию о видео из YouTube API по его идентификатору.
+
+            Args:
+                video_identifier: Идентификатор видео (URL или ID).
+
+            Returns:
+                dict: Словарь с данными о видео.
+
+            Raises:
+                HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+                ValueError: Если идентификатор видео неверного формата или нет информации о видео.
+
+            """
             try:
                 video_identifier = self.__extract_video_identifier(video_identifier)
 
@@ -100,6 +143,16 @@ class YouTubeAPIClientV3:
                 raise
 
         def __format_duration(self, duration_iso8601: str) -> str:
+            """
+            Преобразует длительность видео из формата ISO 8601 в удобочитаемый формат.
+
+            Args:
+                duration_iso8601: Длительность видео в формате ISO 8601.
+
+            Returns:
+                str: Длительность видео в удобочитаемом формате.
+
+            """
             if duration_iso8601 == 'Нет данных':
                 return duration_iso8601
 
@@ -108,6 +161,19 @@ class YouTubeAPIClientV3:
             return video_duration_formatted
 
         def __extract_video_identifier(self, video_identifier: str) -> str:
+            """
+            Извлекает идентификатор видео из переданной строки.
+
+            Args:
+                video_identifier: Строка с URL или ID видео.
+
+            Returns:
+                str: Идентификатор видео.
+
+            Raises:
+                InvalidVideoIdFormatError: Если идентификатор видео неверного формата.
+
+            """
             if 'https://youtu.be/' in video_identifier:
                 # Если сообщение содержит строку 'https://youtu.be/', извлекаем идентификатор видео
                 segments = video_identifier.split("/")
@@ -140,11 +206,51 @@ class YouTubeAPIClientV3:
     
     
     class __Playlist():
+        """
+        Класс для получения информации о плейлисте из YouTube API.
+
+        Attributes:
+            _access__api_resource: Ресурс доступа к YouTube API.
+
+        Methods:
+            get_info(playlist_identifier: str) -> dict:
+                Получает информацию о плейлисте по его идентификатору.
+            __get_info_playlists_duration(playlist_identifier) -> str:
+                Получает общую продолжительность видео в плейлисте.
+            __extract_playlist_identifier(playlist_identifier: str) -> str:
+                Извлекает идентификатор плейлиста из переданной строки.
+
+        Raises:
+            HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+            ValueError: Если идентификатор плейлиста неверного формата или нет информации о плейлисте.
+
+        """
         def __init__(self, access) -> None:
+            """
+            Инициализация объекта класса.
+
+            Args:
+                access: Ресурс доступа к YouTube API.
+
+            """
             self._access__api_resource = access
         
         
         def get_info(self, playlist_identifier: str) -> dict:
+            """
+            Получает информацию о плейлисте из YouTube API по его идентификатору.
+
+            Args:
+                playlist_identifier: Идентификатор плейлиста (URL или ID).
+
+            Returns:
+                dict: Словарь с данными о плейлисте.
+
+            Raises:
+                HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+                ValueError: Если идентификатор плейлиста неверного формата или нет информации о плейлисте.
+
+            """
             try:
                 playlist_identifier: str = self.__extract_playlist_identifier(playlist_identifier)
                 playlist_info_response: dict = self._access__api_resource.playlists().list(
@@ -192,6 +298,19 @@ class YouTubeAPIClientV3:
         
         
         def __get_info_playlists_duration(self, playlist_identifier) -> str:
+            """
+            Получает общую продолжительность видео в плейлисте.
+
+            Args:
+                playlist_identifier: Идентификатор плейлиста.
+
+            Returns:
+                str: Общая продолжительность видео в плейлисте в формате "часы:минуты:секунды".
+
+            Raises:
+                Exception: Если происходит ошибка при получении данных о видео.
+
+            """
             try:
                 next_page_token = None
                 video_ids = []
@@ -245,7 +364,20 @@ class YouTubeAPIClientV3:
                 print(f'Произошла ошибка при получении данных о видео!: {e}')
             
 
-        def __extract_playlist_identifier(self, playlist_identifier: str) -> str:            
+        def __extract_playlist_identifier(self, playlist_identifier: str) -> str:  
+            """
+            Извлекает идентификатор плейлиста из переданной строки.
+
+            Args:
+                playlist_identifier: Строка с URL или ID плейлиста.
+
+            Returns:
+                str: Идентификатор плейлиста.
+
+            Raises:
+                InvalidPlaylistIdFormatError: Если идентификатор плейлиста неверного формата.
+
+            """          
             parsed_url = urlparse(playlist_identifier)
             query_params = parse_qs(parsed_url.query)
 
@@ -264,11 +396,49 @@ class YouTubeAPIClientV3:
     
     
     class __Channel:
+        """
+        Класс для получения информации о канале из YouTube API.
+
+        Attributes:
+            _access__api_resource: Ресурс доступа к YouTube API.
+
+        Methods:
+            get_info(channel_identifier: str) -> dict:
+                Получает информацию о канале по его идентификатору.
+            __extract_channel_identifier(channel_identifier: str) -> str:
+                Извлекает идентификатор канала из переданной строки URL.
+
+        Raises:
+            HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+            ValueError: Если идентификатор канала неверного формата или нет информации о канале.
+
+        """
         def __init__(self, access) -> None:
+            """
+            Инициализация объекта класса.
+
+            Args:
+                access: Ресурс доступа к YouTube API.
+
+            """
             self._access__api_resource = access
         
         
         def get_info(self, channel_identifier: str) -> dict:
+            """
+            Получает информацию о канале из YouTube API по его идентификатору.
+
+            Args:
+                channel_identifier: Идентификатор канала (URL или имя канала).
+
+            Returns:
+                dict: Словарь с данными о канале.
+
+            Raises:
+                HttpError: Если происходит HTTP-ошибка при запросе к YouTube API.
+                ValueError: Если идентификатор канала неверного формата или нет информации о канале.
+
+            """
             try:
                 channel_identifier: str = self.__extract_channel_identifier(channel_identifier)
                 channel_info_response: dict = self._access__api_resource.channels().list(
@@ -315,7 +485,20 @@ class YouTubeAPIClientV3:
                 logger.error(f'An unexpected error occurred: {ex}')
                 raise
         
-        def __extract_channel_identifier(self, channel_identifier: str) -> str:            
+        def __extract_channel_identifier(self, channel_identifier: str) -> str:
+            """
+            Извлекает идентификатор канала из переданной строки URL.
+
+            Args:
+                channel_identifier: Строка с URL или именем канала.
+
+            Returns:
+                str: Идентификатор канала.
+
+            Raises:
+                InvalidChannelIdFormatError: Если идентификатор канала неверного формата.
+
+            """
             if "youtube.com" not in channel_identifier:
                 raise InvalidChannelIdFormatError(channel_identifier)
         

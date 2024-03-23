@@ -2,8 +2,13 @@ import sqlite3
 import io
 from openpyxl import Workbook
 
-
 def send_excel_file() -> io.BytesIO:
+    """
+    Создает файл Excel, содержащий данные из базы данных SQLite.
+    
+    Returns:
+        io.BytesIO: Байтовый поток с данными файла Excel.
+    """
     # Создаем байтовый поток для хранения данных Excel
     excel_buffer = io.BytesIO()
 

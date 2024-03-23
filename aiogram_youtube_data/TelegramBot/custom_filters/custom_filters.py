@@ -4,7 +4,23 @@ from urllib.parse import urlparse, parse_qs
 
 
 class VideoIdentifierFilter(BaseFilter):
+    """
+    Фильтр для проверки сообщений на наличие ссылок на видео YouTube и извлечения идентификаторов видео.
+
+    Attributes:
+        message (Message): Объект сообщения для проверки.
+    """
+
     async def __call__(self, message: Message) -> bool:
+        """
+        Проверяет сообщение на наличие ссылок на видео YouTube и извлекает идентификаторы видео.
+
+        Args:
+            message (Message): Объект сообщения для проверки.
+
+        Returns:
+            bool: True, если сообщение содержит ссылку на видео YouTube с правильным форматом идентификатора, в противном случае False.
+        """
         if 'https://youtu.be/' in message.text:
             # Если сообщение содержит строку 'https://youtu.be/', извлекаем идентификатор видео
             segments = message.text.split("/")
@@ -36,7 +52,23 @@ class VideoIdentifierFilter(BaseFilter):
     
 
 class PlaylistIdentifierFilter(BaseFilter):
+    """
+    Фильтр для проверки сообщений на наличие ссылок на плейлисты YouTube и извлечения идентификаторов плейлистов.
+
+    Attributes:
+        message (Message): Объект сообщения для проверки.
+    """
+
     async def __call__(self, message: Message) -> bool:
+        """
+        Проверяет сообщение на наличие ссылок на плейлисты YouTube и извлекает идентификаторы плейлистов.
+
+        Args:
+            message (Message): Объект сообщения для проверки.
+
+        Returns:
+            bool: True, если сообщение содержит ссылку на плейлист YouTube с правильным форматом идентификатора, в противном случае False.
+        """
         parsed_url = urlparse(message.text)
         query_params = parse_qs(parsed_url.query)
 
@@ -57,7 +89,23 @@ class PlaylistIdentifierFilter(BaseFilter):
 
 
 class ChannelIdentifierFilter(BaseFilter):
+    """
+    Фильтр для проверки сообщений на наличие ссылок на каналы YouTube.
+
+    Attributes:
+        message (Message): Объект сообщения для проверки.
+    """
+
     async def __call__(self, message: Message) -> bool:
+        """
+        Проверяет сообщение на наличие ссылок на каналы YouTube.
+
+        Args:
+            message (Message): Объект сообщения для проверки.
+
+        Returns:
+            bool: True, если сообщение содержит ссылку на канал YouTube, в противном случае False.
+        """
         if "youtube.com" not in message.text:
             return False
         

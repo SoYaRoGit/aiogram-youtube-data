@@ -1,91 +1,155 @@
-from aiogram import Router, F, html
-from aiogram.types import Message, BufferedInputFile
-from aiogram.filters import CommandStart, Command
-from lexicon.lexicon_ru import LEXICON_RU
-from service.youtubeapiclientv3 import YouTubeAPIClientV3
-from models.methods import DataBase
-from custom_filters.custom_filters import (
+from aiogram import Router, html, F  # Импорт класса Router из модуля aiogram
+from aiogram.types import Message, BufferedInputFile  # Импорт типов сообщений и файлов из модуля aiogram
+from aiogram.filters import CommandStart, Command  # Импорт фильтров команд из модуля aiogram
+from lexicon.lexicon_ru import LEXICON_RU  # Импорт русскоязычного лексикона из модуля lexicon_ru
+from service.youtubeapiclientv3 import YouTubeAPIClientV3  # Импорт клиента YouTube API из модуля youtubeapiclientv3
+from models.methods import DataBase  # Импорт методов моделей из модуля methods
+from custom_filters.custom_filters import (  # Импорт пользовательских фильтров из модуля custom_filters
     VideoIdentifierFilter, 
     PlaylistIdentifierFilter,
     ChannelIdentifierFilter)
-from utils.logger import logger
-from config.config import bot
-from telegram_db_excel_service import send_excel_file
+from utils.logger import logger  # Импорт логгера из модуля logger
+from config.config import bot  # Импорт настроек бота из модуля config
+from telegram_db_excel_service import send_excel_file  # Импорт функции отправки файлов Excel из telegram_db_excel_service
 
-
-handler_router = Router()
-serive = YouTubeAPIClientV3()
-database = DataBase()
+handler_router = Router()  # Создание объекта Router для управления обработчиками сообщений
+service = YouTubeAPIClientV3()  # Создание объекта YouTubeAPIClientV3 для работы с API YouTube
+database = DataBase()  # Создание объекта базы данных для взаимодействия с данными
 
 
 # Description Handlers
-@handler_router.message(CommandStart())
+@handler_router.message(CommandStart())  # Обработчик команды /start
 async def cmd_start(message: Message):
-    await message.delete()
+    """
+    Обработчик команды /start.
+
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /start
     await message.answer(
-        text=LEXICON_RU['cmd_start'].format(message.from_user.username)
+        text=LEXICON_RU['cmd_start'].format(message.from_user.username)  # Отправка ответного сообщения с приветствием
     )
-    logger.info(f'Вызов команды /start пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /start пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /start
 
 
-@handler_router.message(F.text == '/help_video')
+@handler_router.message(F.text == '/help_video')  # Обработчик сообщений с текстом /help_video
 async def cmd_help_video(message: Message):
-    await message.delete()
+    """
+    Обработчик команды /help_video.
+
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /help_video
     await message.answer(
-        text=LEXICON_RU['cmd_help_video']
+        text=LEXICON_RU['cmd_help_video']  # Отправка ответного сообщения с помощью по видео
     )
-    logger.info(f'Вызов команды /help_video пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_video пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /help_video
 
 
-@handler_router.message(F.text == '/help_playlist')
+@handler_router.message(F.text == '/help_playlist')  # Обработчик сообщений с текстом /help_playlist
 async def cmd_help_playlist(message: Message):
-    await message.delete()
+    """
+    Обработчик команды /help_playlist.
+
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /help_playlist
     await message.answer(
-        text=LEXICON_RU['cmd_help_playlist']
+        text=LEXICON_RU['cmd_help_playlist']  # Отправка ответного сообщения с помощью по плейлистам
     )
-    logger.info(f'Вызов команды /help_playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_playlist пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /help_playlist
 
 
-@handler_router.message(F.text == '/help_channel')
+@handler_router.message(F.text == '/help_channel')  # Обработчик сообщений с текстом /help_channel
 async def cmd_help_channel(message: Message):
-    await message.delete()
-    await message.answer(
-        text=LEXICON_RU['cmd_help_channel']
-    )
-    logger.info(f'Вызов команды /help_channel пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    """
+    Обработчик команды /help_channel.
 
-@handler_router.message(F.text == '/help_export')
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /help_channel
+    await message.answer(
+        text=LEXICON_RU['cmd_help_channel']  # Отправка ответного сообщения с помощью по каналам
+    )
+    logger.info(f'Вызов команды /help_channel пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /help_channel
+
+
+@handler_router.message(F.text == '/help_export')  # Обработчик сообщений с текстом /help_export
 async def cmd_help_export(message: Message):
-    await message.delete()
+    """
+    Обработчик команды /help_export.
+
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /help_export
     await message.answer(
-        text=LEXICON_RU['cmd_help_export']
+        text=LEXICON_RU['cmd_help_export']  # Отправка ответного сообщения с помощью по экспорту данных
     )
-    logger.info(f'Вызов команды /help_export пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help_export пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /help_export
 
 
-@handler_router.message(Command('help'))
+@handler_router.message(Command('help'))  # Обработчик сообщений с командой /help
 async def cmd_help(message: Message):
-    await message.delete()
+    """
+    Обработчик команды /help.
+
+    Args:
+        message (Message): Объект сообщения, содержащий информацию о команде.
+
+    Returns:
+        None
+    """
+    await message.delete()  # Удаление сообщения с командой /help
     await message.answer(
-        text=LEXICON_RU['cmd_help']
+        text=LEXICON_RU['cmd_help']  # Отправка ответного сообщения с общей справочной информацией
     )
-    logger.info(f'Вызов команды /help пользователем: {message.from_user.full_name} | {message.from_user.id}')
+    logger.info(f'Вызов команды /help пользователем: {message.from_user.full_name} | {message.from_user.id}')  # Логирование вызова команды /help
 
 
 # Handlers for receiving data
-@handler_router.message(PlaylistIdentifierFilter())
+@handler_router.message(PlaylistIdentifierFilter())  # Обработчик сообщений, прошедших фильтр PlaylistIdentifierFilter
 async def cmd_playlist(message: Message):    
+    """
+    Обработчик команд, содержащих идентификаторы плейлистов YouTube.
+
+    Args:
+        message (Message): Объект сообщения с информацией о команде и содержимом.
+
+    Returns:
+        None
+    """
     try:
-        playlist_info: dict = serive.playlist.get_info(message.text)
+        playlist_info: dict = service.playlist.get_info(message.text)  # Получение информации о плейлисте
     except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
+        logger.error(f'Произошла ошибка: {e}')  # Логирование ошибки
         return
     
     try:
-        entities = message.entities or []
+        entities = message.entities or []  # Получение сущностей сообщения (если есть)
         for item in entities:
             if item.type in playlist_info.keys():
-                playlist_info[item.type] = item.extract_from(message.text)
+                playlist_info[item.type] = item.extract_from(message.text)  # Извлечение информации из сущностей сообщения
+        # Отправка информации о плейлисте пользователю
         await message.reply(
             f'📹 Информация о плейлисте\n'
             f'🔒 Тип ресурса: {html.quote(str(playlist_info["kind"]))}\n'
@@ -101,26 +165,36 @@ async def cmd_playlist(message: Message):
             f'👀 Количество видео: {html.quote(str(playlist_info["itemCount"]))}\n'
             f'⏱️ Продолжительность плейлиста: {html.quote(str(playlist_info["duration"]))}\n'
         )
-        logger.info(f'Данные о плейлисте: {str(playlist_info["id_playlist"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
-        database.save_playlist_info(playlist_info)
+        logger.info(f'Данные о плейлисте: {str(playlist_info["id_playlist"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')  # Логирование успешной отправки информации о плейлисте
+        database.save_playlist_info(playlist_info)  # Сохранение информации о плейлисте в базе данных
     except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
-        return 
+        logger.error(f'Произошла ошибка: {e}')  # Логирование ошибки
+        return
 
 
-@handler_router.message(VideoIdentifierFilter())
+@handler_router.message(VideoIdentifierFilter())  # Обработчик сообщений, прошедших фильтр VideoIdentifierFilter
 async def cmd_video(message: Message):
+    """
+    Обработчик команд, содержащих идентификаторы видео YouTube.
+
+    Args:
+        message (Message): Объект сообщения с информацией о команде и содержимом.
+
+    Returns:
+        None
+    """
     try:
-        video_info: dict = serive.video.get_info(message.text)
+        video_info: dict = service.video.get_info(message.text)  # Получение информации о видео
     except Exception as e:
-        logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {message.text}')
+        logger.error(f'Произошла ошибка при получении данных о видео пользователем: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {message.text}')  # Логирование ошибки
         return
     
     try:
-        entities = message.entities or []
+        entities = message.entities or []  # Получение сущностей сообщения (если есть)
         for item in entities:
             if item.type in video_info.keys():
-                video_info[item.type] = item.extract_from(message.text)
+                video_info[item.type] = item.extract_from(message.text)  # Извлечение информации из сущностей сообщения
+        # Отправка информации о видео пользователю
         await message.reply(
             f'📹 Информация о видео\n'
             f'🔒 Тип ресурса: {html.quote(str(video_info["kind"]))}\n'
@@ -150,26 +224,36 @@ async def cmd_video(message: Message):
             f'👍 Лайки: {html.quote(str(video_info["likeCount"]))}\n'
             f'💬 Комментарии: {html.quote(str(video_info["commentCount"]))}\n'
         )
-        logger.info(f'Данные о видео: {str(video_info["id_video"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
-        database.save_video_info(video_info)
+        logger.info(f'Данные о видео: {str(video_info["id_video"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')  # Логирование успешной отправки информации о видео
+        database.save_video_info(video_info)  # Сохранение информации о видео в базе данных
     except Exception as e:
-        logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id_video"])} | {e}')
+        logger.error(f'Произошла ошибка в момент отправки данных о видео | Пользователь: {message.from_user.full_name} | {message.from_user.id} | Идентификатор: {str(video_info["id_video"])} | {e}')  # Логирование ошибки
         return
 
 
-@handler_router.message(ChannelIdentifierFilter())
+@handler_router.message(ChannelIdentifierFilter())  # Обработчик сообщений, прошедших фильтр ChannelIdentifierFilter
 async def cmd_channel(message: Message):    
+    """
+    Обработчик команд, содержащих идентификаторы каналов на YouTube.
+
+    Args:
+        message (Message): Объект сообщения с информацией о команде и содержимом.
+
+    Returns:
+        None
+    """
     try:
-        channel_info: dict = serive.channel.get_info(message.text)
+        channel_info: dict = service.channel.get_info(message.text)  # Получение информации о канале
     except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
+        logger.error(f'Произошла ошибка: {e}')  # Логирование ошибки
         return
     
     try:
-        entities = message.entities or []
+        entities = message.entities or []  # Получение сущностей сообщения (если есть)
         for item in entities:
             if item.type in channel_info.keys():
-                channel_info[item.type] = item.extract_from(message.text)
+                channel_info[item.type] = item.extract_from(message.text)  # Извлечение информации из сущностей сообщения
+        # Отправка информации о канале пользователю
         await message.reply(
             f'📹 Информация о канале\n'
             f'🔒 Тип ресурса: {html.quote(str(channel_info["kind"]))}\n'
@@ -188,21 +272,39 @@ async def cmd_channel(message: Message):
             f'🕒 Может ли канал загружать видео продолжительностью более 15 минут: {html.quote(str(channel_info["longUploadsStatus"]))}\n'
             f'👀 Обозначен ли канал как предназначенный для детей: {html.quote(str(channel_info["madeForKids"]))}'
         )
-        logger.info(f'Данные о канале: {str(channel_info["title"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')
-        database.save_channel_info(channel_info)
+        logger.info(f'Данные о канале: {str(channel_info["title"])} были успешно отправлены пользователю: {message.from_user.full_name} | {message.from_user.id}')  # Логирование успешной отправки информации о канале
+        database.save_channel_info(channel_info)  # Сохранение информации о канале в базе данных
     except Exception as e:
-        logger.error(f'Произошла ошибка: {e}')
-        return 
+        logger.error(f'Произошла ошибка: {e}')  # Логирование ошибки
+        return
 
 
-@handler_router.message(Command('export'))
+@handler_router.message(Command('export'))  # Обработчик сообщений, содержащих команду /export
 async def cmd_export(message: Message):
-    excel_file = send_excel_file()
-    await bot.send_document(message.from_user.id, document=BufferedInputFile(excel_file.read(), 'db_data.xlsx'))
-    logger.info(f'Произведена выгрузка данных /export для польователя: {message.from_user.full_name} | {message.from_user.id}')
-    
+    """
+    Обработчик команды /export, который отправляет пользователю файл Excel с данными из базы данных.
 
-@handler_router.message()
+    Args:
+        message (Message): Объект сообщения с информацией о команде и отправителе.
+
+    Returns:
+        None
+    """
+    excel_file = send_excel_file()  # Генерация файла Excel с данными из базы данных
+    await bot.send_document(message.from_user.id, document=BufferedInputFile(excel_file.read(), 'db_data.xlsx'))  # Отправка файла пользователю
+    logger.info(f'Произведена выгрузка данных /export для польователя: {message.from_user.full_name} | {message.from_user.id}')  # Логирование события выгрузки данных
+
+
+@handler_router.message()  # Обработчик всех сообщений (без фильтрации)
 async def cmd_empty(message: Message):
-    await message.reply(text='Введеная неизвестная команда или идентификатор')
-    logger.info(f'Введена неизвестная команда или идентификатор: {message.from_user.full_name} | {message.from_user.id} | Текст: {message.text}')
+    """
+    Обработчик для сообщений, не соответствующих ни одной из предыдущих команд.
+
+    Args:
+        message (Message): Объект сообщения с информацией о отправителе и тексте сообщения.
+
+    Returns:
+        None
+    """
+    await message.reply(text='Введеная неизвестная команда или идентификатор')  # Отправка ответного сообщения о неизвестной команде
+    logger.info(f'Введена неизвестная команда или идентификатор: {message.from_user.full_name} | {message.from_user.id} | Текст: {message.text}')  # Логирование события
