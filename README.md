@@ -129,7 +129,7 @@ ruff 0.3.2 An extremely fast Python linter and code formatter, written in Rust.
 CTRL+SHIFT+P -> Select interpreter -> Poetry
 ```
 
-Переименуйте файл .env.example в .exe
+Переименуйте файл .env.example в .env
 ```bash
 .env.example -> .env
 ```
