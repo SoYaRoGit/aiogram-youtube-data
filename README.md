@@ -122,7 +122,7 @@ openpyxl 3.1.2 A Python library to read/write Excel 2010 xlsx/xlsm files
 ruff 0.3.2 An extremely fast Python linter and code formatter, written in Rust.
 ```
 
-В случае, если проект не видит библиотеки явно укажите интепритатор
+В случае, если проект не видит библиотеки явно укажите интерпретатор
 
 В Visual Studio Code
 ```
